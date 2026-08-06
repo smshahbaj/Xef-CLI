@@ -1,0 +1,8 @@
+log:
+  level: info
+  format: pretty
+  output: stdout
+
+http:
+  timeout: 30s
+  retries: 3
