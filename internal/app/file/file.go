@@ -380,7 +380,7 @@ func newCleanCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringSliceVarP(&patterns, "pattern", "p", nil, "file patterns to clean")
+	cmd.Flags().StringSliceVar(&patterns, "pattern", nil, "file patterns to clean")
 	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "show what would be removed")
 	return cmd
 }

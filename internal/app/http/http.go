@@ -60,7 +60,7 @@ func newGetCmd(client interfaces.HTTPClient, log logger.Logger) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringSliceVarP(&headers, "header", "H", nil, "request headers (Key:Value)")
+	cmd.Flags().StringSliceVar(&headers, "header", nil, "request headers (Key:Value)")
 	cmd.Flags().DurationVar(&timeout, "timeout", 30*time.Second, "request timeout")
 	return cmd
 }
@@ -97,8 +97,8 @@ func newDownloadCmd(client interfaces.HTTPClient, log logger.Logger) *cobra.Comm
 		},
 	}
 
-	cmd.Flags().StringVarP(&output, "output", "o", "", "output file path")
-	cmd.Flags().StringSliceVarP(&headers, "header", "H", nil, "request headers")
+	cmd.Flags().StringVar(&output, "output", "", "output file path")
+	cmd.Flags().StringSliceVar(&headers, "header", nil, "request headers")
 	return cmd
 }
 
@@ -198,8 +198,8 @@ func newBenchmarkCmd(client interfaces.HTTPClient, log logger.Logger) *cobra.Com
 		},
 	}
 
-	cmd.Flags().IntVarP(&requests, "requests", "n", 100, "number of requests")
-	cmd.Flags().IntVarP(&concurrency, "concurrency", "c", 10, "concurrent requests")
+	cmd.Flags().IntVar(&requests, "requests", 100, "number of requests")
+	cmd.Flags().IntVar(&concurrency, "concurrency", 10, "concurrent requests")
 	cmd.Flags().DurationVar(&timeout, "timeout", 10*time.Second, "request timeout")
 	return cmd
 }

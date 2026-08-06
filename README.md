@@ -43,7 +43,7 @@ A production-grade, cross-platform CLI toolkit built in Go for developers who de
 - `branches` - List branches with commit info
 
 ### 🛠️ Dev Tools
-- `project create` - Scaffold Go/Python projects
+- `project` - Scaffold Go/Python projects
 - `env` - Display environment variables
 
 ## 🚀 Installation
@@ -55,12 +55,6 @@ go install github.com/xef/xefcli/cmd/xefcli@latest
 
 ### Pre-built Binaries
 Download from [Releases](https://github.com/xef/xefcli/releases)
-
-### Homebrew (macOS/Linux)
-```bash
-brew tap xef/tap
-brew install xefcli
-```
 
 ## 📖 Quick Start
 
@@ -89,7 +83,7 @@ xef system disk
 xef git stats
 
 # Create project
-xef dev project create myapp --lang go
+xef dev project myapp --lang go
 ```
 
 ## 🏗️ Architecture

@@ -30,9 +30,9 @@ func newProjectCreateCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Com
 	var lang string
 
 	cmd := &cobra.Command{
-		Use:     "project create [name]",
+		Use:     "project [name]",
 		Short:   "Create a new project scaffold",
-		Example: `  xef dev project create myapp --lang go`,
+		Example: `  xef dev project myapp --lang go`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
@@ -62,7 +62,7 @@ func newProjectCreateCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Com
 		},
 	}
 
-	cmd.Flags().StringVarP(&lang, "lang", "l", "go", "project language (go, python)")
+	cmd.Flags().StringVar(&lang, "lang", "go", "project language (go, python)")
 	return cmd
 }
 
@@ -92,11 +92,11 @@ func main() {
 `, projectName)
 
 	files := map[string]string{
-		filepath.Join(name, "go.mod"):               fmt.Sprintf("module %s\n\ngo 1.22\n", projectName),
+		filepath.Join(name, "go.mod"):                      fmt.Sprintf("module %s\n\ngo 1.22\n", projectName),
 		filepath.Join(name, "cmd", projectName, "main.go"): mainGo,
-		filepath.Join(name, "README.md"):            fmt.Sprintf("# %s\n\nA Go project.\n", toTitle(projectName)),
-		filepath.Join(name, "Makefile"):             ".PHONY: build\nbuild:\n\tgo build -o bin/" + projectName + " ./cmd/" + projectName + "\n",
-		filepath.Join(name, ".gitignore"):           "/bin/\n*.exe\n*.test\n/vendor/\n",
+		filepath.Join(name, "README.md"):                   fmt.Sprintf("# %s\n\nA Go project.\n", toTitle(projectName)),
+		filepath.Join(name, "Makefile"):                    ".PHONY: build\nbuild:\n\tgo build -o bin/" + projectName + " ./cmd/" + projectName + "\n",
+		filepath.Join(name, ".gitignore"):                  "/bin/\n*.exe\n*.test\n/vendor/\n",
 	}
 
 	for path, content := range files {
@@ -129,9 +129,9 @@ description = "A Python project"
 requires-python = ">=3.10"
 `, projectName),
 		filepath.Join(name, projectName, "__init__.py"): "",
-		filepath.Join(name, projectName, "main.py"):       "def main():\n    print('Hello, World!')\n\nif __name__ == '__main__':\n    main()\n",
-		filepath.Join(name, "README.md"):                 fmt.Sprintf("# %s\n\nA Python project.\n", toTitle(projectName)),
-		filepath.Join(name, ".gitignore"):                "__pycache__/\n*.pyc\n.venv/\n",
+		filepath.Join(name, projectName, "main.py"):     "def main():\n    print('Hello, World!')\n\nif __name__ == '__main__':\n    main()\n",
+		filepath.Join(name, "README.md"):                fmt.Sprintf("# %s\n\nA Python project.\n", toTitle(projectName)),
+		filepath.Join(name, ".gitignore"):               "__pycache__/\n*.pyc\n.venv/\n",
 	}
 
 	for path, content := range files {
@@ -191,6 +191,6 @@ func newEnvCmd(log logger.Logger) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&format, "format", "f", "list", "output format: list, json, export")
+	cmd.Flags().StringVar(&format, "format", "list", "output format: list, json, export")
 	return cmd
 }

@@ -71,8 +71,8 @@ func newFormatCmd(log logger.Logger) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&indent, "indent", "i", "  ", "indentation string")
-	cmd.Flags().BoolVarP(&compact, "compact", "c", false, "compact output")
+	cmd.Flags().StringVar(&indent, "indent", "  ", "indentation string")
+	cmd.Flags().BoolVar(&compact, "compact", false, "compact output")
 	return cmd
 }
 

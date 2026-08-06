@@ -123,7 +123,7 @@ func newBCryptCmd(hasher interfaces.Hasher, log logger.Logger) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().IntVarP(&cost, "cost", "c", 10, "bcrypt cost factor (4-31)")
+	cmd.Flags().IntVar(&cost, "cost", 10, "bcrypt cost factor (4-31)")
 	cmd.Flags().StringVar(&compare, "compare", "", "hash to compare against")
 	return cmd
 }
@@ -148,8 +148,8 @@ func newUUIDCmd(log logger.Logger) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().IntVarP(&count, "count", "n", 1, "number of UUIDs to generate")
-	cmd.Flags().BoolVarP(&upper, "upper", "u", false, "uppercase output")
+	cmd.Flags().IntVar(&count, "count", 1, "number of UUIDs to generate")
+	cmd.Flags().BoolVar(&upper, "upper", false, "uppercase output")
 	return cmd
 }
 
@@ -178,7 +178,7 @@ func newBase64Cmd(log logger.Logger) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVarP(&decode, "decode", "d", false, "decode instead of encode")
+	cmd.Flags().BoolVar(&decode, "decode", false, "decode instead of encode")
 	return cmd
 }
 
@@ -202,7 +202,7 @@ func newPasswordCmd(log logger.Logger) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().IntVarP(&length, "length", "l", 16, "password length (minimum 4)")
+	cmd.Flags().IntVar(&length, "length", 16, "password length (minimum 4)")
 	cmd.Flags().BoolVar(&noSpecial, "no-special", false, "exclude special characters")
 	cmd.Flags().BoolVar(&noNumbers, "no-numbers", false, "exclude numbers")
 	cmd.Flags().BoolVar(&noUpper, "no-upper", false, "exclude uppercase letters")

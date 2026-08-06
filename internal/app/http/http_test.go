@@ -61,7 +61,7 @@ func TestBenchmarkCmd(t *testing.T) {
 	cmd := newBenchmarkCmd(client, log)
 
 	t.Run("benchmark", func(t *testing.T) {
-		cmd.SetArgs([]string{"https://example.com", "-n", "10", "-c", "2"})
+		cmd.SetArgs([]string{"https://example.com", "--requests", "10", "--concurrency", "2"})
 		err := cmd.Execute()
 		assert.NoError(t, err)
 	})
