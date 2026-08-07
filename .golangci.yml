@@ -12,8 +12,6 @@ linters:
     - ineffassign
     - staticcheck
     - unused
-    - gofmt
-    - goimports
     - misspell
     - revive
     - gocritic
@@ -29,7 +27,11 @@ linters:
         - style
         - experimental
 
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
 issues:
-  exclude-use-default: false
   max-issues-per-linter: 0
   max-same-issues: 0
