@@ -6,10 +6,12 @@ dist/
 *.so
 *.dylib
 
-# Test
+# Test & Coverage
 *.test
 *.out
+coverage/
 coverage.out
+*.html
 
 # Go
 vendor/
