@@ -1,3 +1,4 @@
+// Package http contains HTTP client commands and helpers.
 package http
 
 import (
@@ -9,11 +10,11 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
+	"github.com/smshahbaj/Xef-CLI/internal/pkg/tui"
+	"github.com/smshahbaj/Xef-CLI/internal/pkg/utils"
 	"github.com/spf13/cobra"
-	"github.com/xef/xefcli/internal/core/interfaces"
-	"github.com/xef/xefcli/internal/core/logger"
-	"github.com/xef/xefcli/internal/pkg/tui"
-	"github.com/xef/xefcli/internal/pkg/utils"
 )
 
 // NewCommand creates the http command group.
@@ -102,7 +103,7 @@ func newDownloadCmd(client interfaces.HTTPClient, log logger.Logger) *cobra.Comm
 	return cmd
 }
 
-func newBenchmarkCmd(client interfaces.HTTPClient, log logger.Logger) *cobra.Command {
+func newBenchmarkCmd(client interfaces.HTTPClient, _ logger.Logger) *cobra.Command {
 	var requests int
 	var concurrency int
 	var timeout time.Duration
@@ -121,8 +122,8 @@ func newBenchmarkCmd(client interfaces.HTTPClient, log logger.Logger) *cobra.Com
 			semaphore := make(chan struct{}, concurrency)
 
 			type result struct {
-				status int
 				err    error
+				status int
 				dur    time.Duration
 			}
 

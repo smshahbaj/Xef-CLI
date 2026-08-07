@@ -1,3 +1,4 @@
+// Package system provides system information commands.
 package system
 
 import (
@@ -7,11 +8,11 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
+	"github.com/smshahbaj/Xef-CLI/internal/pkg/tui"
+	"github.com/smshahbaj/Xef-CLI/internal/pkg/utils"
 	"github.com/spf13/cobra"
-	"github.com/xef/xefcli/internal/core/interfaces"
-	"github.com/xef/xefcli/internal/core/logger"
-	"github.com/xef/xefcli/internal/pkg/tui"
-	"github.com/xef/xefcli/internal/pkg/utils"
 )
 
 // NewCommand creates the system command group.
@@ -28,11 +29,11 @@ func NewCommand(provider interfaces.SystemInfoProvider, log logger.Logger) *cobr
 	return cmd
 }
 
-func newCPUCmd(provider interfaces.SystemInfoProvider, log logger.Logger) *cobra.Command {
+func newCPUCmd(provider interfaces.SystemInfoProvider, _ logger.Logger) *cobra.Command {
 	return &cobra.Command{
 		Use:   "cpu",
 		Short: "Show CPU information",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
 			defer cancel()
 
@@ -55,11 +56,11 @@ func newCPUCmd(provider interfaces.SystemInfoProvider, log logger.Logger) *cobra
 	}
 }
 
-func newMemoryCmd(provider interfaces.SystemInfoProvider, log logger.Logger) *cobra.Command {
+func newMemoryCmd(provider interfaces.SystemInfoProvider, _ logger.Logger) *cobra.Command {
 	return &cobra.Command{
 		Use:   "memory",
 		Short: "Show memory information",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
 			defer cancel()
 
@@ -81,11 +82,11 @@ func newMemoryCmd(provider interfaces.SystemInfoProvider, log logger.Logger) *co
 	}
 }
 
-func newDiskCmd(provider interfaces.SystemInfoProvider, log logger.Logger) *cobra.Command {
+func newDiskCmd(provider interfaces.SystemInfoProvider, _ logger.Logger) *cobra.Command {
 	return &cobra.Command{
 		Use:   "disk",
 		Short: "Show disk usage information",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
 			defer cancel()
 

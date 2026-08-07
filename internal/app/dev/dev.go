@@ -1,3 +1,4 @@
+// Package dev provides development helper commands used during development.
 package dev
 
 import (
@@ -7,10 +8,10 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
+	"github.com/smshahbaj/Xef-CLI/internal/pkg/tui"
 	"github.com/spf13/cobra"
-	"github.com/xef/xefcli/internal/core/interfaces"
-	"github.com/xef/xefcli/internal/core/logger"
-	"github.com/xef/xefcli/internal/pkg/tui"
 )
 
 // NewCommand creates the dev command group.
@@ -26,7 +27,7 @@ func NewCommand(fs interfaces.FileSystem, log logger.Logger) *cobra.Command {
 	return cmd
 }
 
-func newProjectCreateCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Command {
+func newProjectCreateCmd(fs interfaces.FileSystem, _ logger.Logger) *cobra.Command {
 	var lang string
 
 	cmd := &cobra.Command{
@@ -34,13 +35,13 @@ func newProjectCreateCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Com
 		Short:   "Create a new project scaffold",
 		Example: `  xef dev project myapp --lang go`,
 		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			name := args[0]
 			if fs.Exists(name) {
 				return fmt.Errorf("directory %s already exists", name)
 			}
 
-			if err := fs.MkdirAll(name, 0755); err != nil {
+			if err := fs.MkdirAll(name, 0o755); err != nil {
 				return fmt.Errorf("failed to create project: %w", err)
 			}
 
@@ -77,7 +78,7 @@ func scaffoldGo(fs interfaces.FileSystem, name string) error {
 	}
 
 	for _, d := range dirs {
-		if err := fs.MkdirAll(d, 0755); err != nil {
+		if err := fs.MkdirAll(d, 0o755); err != nil {
 			return err
 		}
 	}
@@ -100,7 +101,7 @@ func main() {
 	}
 
 	for path, content := range files {
-		if err := fs.WriteFile(path, []byte(content), 0644); err != nil {
+		if err := fs.WriteFile(path, []byte(content), 0o644); err != nil {
 			return err
 		}
 	}
@@ -116,7 +117,7 @@ func scaffoldPython(fs interfaces.FileSystem, name string) error {
 	}
 
 	for _, d := range dirs {
-		if err := fs.MkdirAll(d, 0755); err != nil {
+		if err := fs.MkdirAll(d, 0o755); err != nil {
 			return err
 		}
 	}
@@ -135,7 +136,7 @@ requires-python = ">=3.10"
 	}
 
 	for path, content := range files {
-		if err := fs.WriteFile(path, []byte(content), 0644); err != nil {
+		if err := fs.WriteFile(path, []byte(content), 0o644); err != nil {
 			return err
 		}
 	}
@@ -152,14 +153,14 @@ func toTitle(s string) string {
 	return string(runes)
 }
 
-func newEnvCmd(log logger.Logger) *cobra.Command {
+func newEnvCmd(_ logger.Logger) *cobra.Command {
 	var format string
 
 	cmd := &cobra.Command{
 		Use:     "env",
 		Short:   "Show environment variables",
 		Example: `  xef dev env --format json`,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			envs := os.Environ()
 			switch strings.ToLower(format) {
 			case "json":

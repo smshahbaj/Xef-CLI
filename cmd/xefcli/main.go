@@ -4,7 +4,7 @@ package main
 import (
 	"os"
 
-	"github.com/xef/xefcli/internal/app"
+	"github.com/smshahbaj/Xef-CLI/internal/app"
 )
 
 var version = "v1.0.1"

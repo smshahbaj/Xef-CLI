@@ -2,8 +2,8 @@
 
 **The Ultimate Open-Source Developer Toolkit**
 
-[![CI](https://github.com/xef/xefcli/actions/workflows/ci.yml/badge.svg)](https://github.com/xef/xefcli/actions)
-[![Go Report Card](https://goreportcard.com/badge/github.com/xef/xefcli)](https://goreportcard.com/report/github.com/xef/xefcli)
+[![CI](https://github.com/smshahbaj/Xef-CLI/actions/workflows/ci.yml/badge.svg)](https://github.com/smshahbaj/Xef-CLI/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/smshahbaj/Xef-CLI)](https://goreportcard.com/report/github.com/smshahbaj/Xef-CLI)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A production-grade, cross-platform CLI toolkit built in Go for developers who demand quality, performance, and reliability.
@@ -50,11 +50,11 @@ A production-grade, cross-platform CLI toolkit built in Go for developers who de
 
 ### From Source
 ```bash
-go install github.com/xef/xefcli/cmd/xefcli@latest
+go install github.com/smshahbaj/Xef-CLI/cmd/xefcli@latest
 ```
 
 ### Pre-built Binaries
-Download from [Releases](https://github.com/xef/xefcli/releases)
+Download from [Releases](https://github.com/smshahbaj/Xef-CLI/releases)
 
 ## 📖 Quick Start
 

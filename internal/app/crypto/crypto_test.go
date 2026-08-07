@@ -3,11 +3,11 @@ package crypto
 import (
 	"testing"
 
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
+	"github.com/smshahbaj/Xef-CLI/internal/infrastructure/crypto"
+	"github.com/smshahbaj/Xef-CLI/internal/test/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xef/xefcli/internal/core/logger"
-	"github.com/xef/xefcli/internal/infrastructure/crypto"
-	"github.com/xef/xefcli/internal/test/mocks"
 )
 
 func TestNewCommand(t *testing.T) {

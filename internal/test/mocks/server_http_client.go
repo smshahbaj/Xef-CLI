@@ -2,12 +2,13 @@ package mocks
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/xef/xefcli/internal/core/interfaces"
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
 )
 
 // ServerHTTPClient is a simple HTTP client test double that performs real requests to a supplied URL.
@@ -18,7 +19,7 @@ type ServerHTTPClient struct {
 // Get performs an HTTP GET request and returns the response body.
 func (m *ServerHTTPClient) Get(ctx context.Context, url string, headers map[string]string) (*interfaces.HTTPResponse, error) {
 	client := &http.Client{Timeout: m.Timeout}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +30,11 @@ func (m *ServerHTTPClient) Get(ctx context.Context, url string, headers map[stri
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			fmt.Printf("error closing response body: %v\n", cerr)
+		}
+	}()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -51,7 +56,11 @@ func (m *ServerHTTPClient) Post(ctx context.Context, url string, body io.Reader,
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			fmt.Printf("error closing response body: %v\n", cerr)
+		}
+	}()
 	payload, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err

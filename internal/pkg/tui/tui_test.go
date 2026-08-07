@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPrintFunctions(t *testing.T) {
+func TestPrintFunctions(_ *testing.T) {
 	// These print to stdout; we just verify they don't panic
 	PrintSuccess("test success")
 	PrintError("test error")

@@ -4,15 +4,15 @@ package mocks
 import (
 	"sync"
 
-	"github.com/xef/xefcli/internal/core/interfaces"
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
 )
 
 // MockFileSystem is a test double for FileSystem.
 type MockFileSystem struct {
-	mu       sync.RWMutex
 	Files    map[string][]byte
 	Dirs     map[string]bool
 	ExistsFn func(string) bool
+	mu       sync.RWMutex
 }
 
 // NewMockFileSystem creates a new mock file system.
@@ -23,6 +23,7 @@ func NewMockFileSystem() *MockFileSystem {
 	}
 }
 
+// ReadFile reads a file from the mock filesystem.
 func (m *MockFileSystem) ReadFile(path string) ([]byte, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -33,20 +34,23 @@ func (m *MockFileSystem) ReadFile(path string) ([]byte, error) {
 	return data, nil
 }
 
-func (m *MockFileSystem) WriteFile(path string, data []byte, perm uint32) error {
+// WriteFile writes data to the mock filesystem at path.
+func (m *MockFileSystem) WriteFile(path string, data []byte, _ uint32) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.Files[path] = data
 	return nil
 }
 
-func (m *MockFileSystem) MkdirAll(path string, perm uint32) error {
+// MkdirAll creates a directory path in the mock filesystem.
+func (m *MockFileSystem) MkdirAll(path string, _ uint32) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.Dirs[path] = true
 	return nil
 }
 
+// Remove deletes a file from the mock filesystem.
 func (m *MockFileSystem) Remove(path string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -54,6 +58,7 @@ func (m *MockFileSystem) Remove(path string) error {
 	return nil
 }
 
+// RemoveAll deletes all files under the given path in the mock filesystem.
 func (m *MockFileSystem) RemoveAll(path string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -65,6 +70,7 @@ func (m *MockFileSystem) RemoveAll(path string) error {
 	return nil
 }
 
+// Exists reports whether the given path exists in the mock filesystem.
 func (m *MockFileSystem) Exists(path string) bool {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -79,6 +85,7 @@ func (m *MockFileSystem) Exists(path string) bool {
 	return ok
 }
 
+// IsDir reports whether the given path is a directory in the mock filesystem.
 func (m *MockFileSystem) IsDir(path string) bool {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -86,10 +93,11 @@ func (m *MockFileSystem) IsDir(path string) bool {
 	return ok
 }
 
-func (m *MockFileSystem) ListDir(path string) ([]interfaces.FileInfo, error) {
+// ListDir returns a list of files in the mock filesystem.
+func (m *MockFileSystem) ListDir(_ string) ([]interfaces.FileInfo, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	var result []interfaces.FileInfo
+	result := make([]interfaces.FileInfo, 0, len(m.Files))
 	for p, data := range m.Files {
 		result = append(result, interfaces.FileInfo{
 			Name: p,
@@ -100,7 +108,8 @@ func (m *MockFileSystem) ListDir(path string) ([]interfaces.FileInfo, error) {
 	return result, nil
 }
 
-func (m *MockFileSystem) WalkDir(root string, fn func(path string, info interfaces.FileInfo, err error) error) error {
+// WalkDir walks the mock filesystem and invokes fn for each file.
+func (m *MockFileSystem) WalkDir(_ string, fn func(path string, info interfaces.FileInfo, err error) error) error {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	for p, data := range m.Files {

@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
+	"github.com/smshahbaj/Xef-CLI/internal/infrastructure/filesystem"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xef/xefcli/internal/core/logger"
-	"github.com/xef/xefcli/internal/infrastructure/filesystem"
 )
 
 func TestNewCommand(t *testing.T) {
@@ -33,7 +33,7 @@ func TestOrganizeCmd(t *testing.T) {
 
 	t.Run("not a directory", func(t *testing.T) {
 		tmpFile := filepath.Join(t.TempDir(), "file.txt")
-		require.NoError(t, os.WriteFile(tmpFile, []byte("test"), 0644))
+		require.NoError(t, os.WriteFile(tmpFile, []byte("test"), 0o644))
 		cmd.SetArgs([]string{tmpFile})
 		err := cmd.Execute()
 		assert.Error(t, err)
@@ -41,8 +41,8 @@ func TestOrganizeCmd(t *testing.T) {
 
 	t.Run("organize by extension dry run", func(t *testing.T) {
 		dir := t.TempDir()
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "a.txt"), []byte("a"), 0644))
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "b.go"), []byte("b"), 0644))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "a.txt"), []byte("a"), 0o644))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "b.go"), []byte("b"), 0o644))
 
 		cmd.SetArgs([]string{dir, "--by", "extension", "--dry-run"})
 		err := cmd.Execute()
@@ -63,8 +63,8 @@ func TestStatsCmd(t *testing.T) {
 
 	t.Run("valid directory", func(t *testing.T) {
 		dir := t.TempDir()
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "a.txt"), []byte("hello"), 0644))
-		require.NoError(t, os.MkdirAll(filepath.Join(dir, "sub"), 0755))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "a.txt"), []byte("hello"), 0o644))
+		require.NoError(t, os.MkdirAll(filepath.Join(dir, "sub"), 0o755))
 
 		cmd.SetArgs([]string{dir})
 		err := cmd.Execute()
@@ -78,8 +78,8 @@ func TestCleanCmd(t *testing.T) {
 
 	t.Run("clean with dry run", func(t *testing.T) {
 		dir := t.TempDir()
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "a.tmp"), []byte("temp"), 0644))
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "b.txt"), []byte("keep"), 0644))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "a.tmp"), []byte("temp"), 0o644))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "b.txt"), []byte("keep"), 0o644))
 
 		cleanCmd := newCleanCmd(fs, log)
 		cleanCmd.SetArgs([]string{dir, "--dry-run"})
@@ -89,8 +89,8 @@ func TestCleanCmd(t *testing.T) {
 
 	t.Run("clean removes files", func(t *testing.T) {
 		dir := t.TempDir()
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "a.tmp"), []byte("temp"), 0644))
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "b.txt"), []byte("keep"), 0644))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "a.tmp"), []byte("temp"), 0o644))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "b.txt"), []byte("keep"), 0o644))
 
 		cleanCmd := newCleanCmd(fs, log)
 		cleanCmd.SetArgs([]string{dir})
@@ -105,7 +105,7 @@ func TestHashFile(t *testing.T) {
 	fs := filesystem.NewOSFileSystem()
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.txt")
-	require.NoError(t, os.WriteFile(path, []byte("hello"), 0644))
+	require.NoError(t, os.WriteFile(path, []byte("hello"), 0o644))
 
 	hash1, err := hashFile(fs, path)
 	require.NoError(t, err)
@@ -116,7 +116,7 @@ func TestHashFile(t *testing.T) {
 	assert.Equal(t, hash1, hash2)
 
 	// Different content = different hash
-	require.NoError(t, os.WriteFile(path, []byte("world"), 0644))
+	require.NoError(t, os.WriteFile(path, []byte("world"), 0o644))
 	hash3, err := hashFile(fs, path)
 	require.NoError(t, err)
 	assert.NotEqual(t, hash1, hash3)

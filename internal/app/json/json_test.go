@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xef/xefcli/internal/core/logger"
 )
 
 func TestNewCommand(t *testing.T) {
@@ -24,7 +24,7 @@ func TestFormatCmd(t *testing.T) {
 
 	t.Run("format file", func(t *testing.T) {
 		tmpFile := filepath.Join(t.TempDir(), "test.json")
-		require.NoError(t, os.WriteFile(tmpFile, []byte(`{"a":1}`), 0644))
+		require.NoError(t, os.WriteFile(tmpFile, []byte(`{"a":1}`), 0o644))
 
 		cmd.SetArgs([]string{tmpFile})
 		err := cmd.Execute()
@@ -33,7 +33,7 @@ func TestFormatCmd(t *testing.T) {
 
 	t.Run("compact output", func(t *testing.T) {
 		tmpFile := filepath.Join(t.TempDir(), "test.json")
-		require.NoError(t, os.WriteFile(tmpFile, []byte(`{"a":1}`), 0644))
+		require.NoError(t, os.WriteFile(tmpFile, []byte(`{"a":1}`), 0o644))
 
 		cmd.SetArgs([]string{tmpFile, "--compact"})
 		err := cmd.Execute()
@@ -42,7 +42,7 @@ func TestFormatCmd(t *testing.T) {
 
 	t.Run("invalid json", func(t *testing.T) {
 		tmpFile := filepath.Join(t.TempDir(), "bad.json")
-		require.NoError(t, os.WriteFile(tmpFile, []byte(`{invalid`), 0644))
+		require.NoError(t, os.WriteFile(tmpFile, []byte(`{invalid`), 0o644))
 
 		cmd.SetArgs([]string{tmpFile})
 		err := cmd.Execute()
@@ -56,7 +56,7 @@ func TestValidateCmd(t *testing.T) {
 
 	t.Run("valid json", func(t *testing.T) {
 		tmpFile := filepath.Join(t.TempDir(), "valid.json")
-		require.NoError(t, os.WriteFile(tmpFile, []byte(`{"a":1}`), 0644))
+		require.NoError(t, os.WriteFile(tmpFile, []byte(`{"a":1}`), 0o644))
 
 		cmd.SetArgs([]string{tmpFile})
 		err := cmd.Execute()
@@ -65,7 +65,7 @@ func TestValidateCmd(t *testing.T) {
 
 	t.Run("invalid json", func(t *testing.T) {
 		tmpFile := filepath.Join(t.TempDir(), "invalid.json")
-		require.NoError(t, os.WriteFile(tmpFile, []byte(`{bad`), 0644))
+		require.NoError(t, os.WriteFile(tmpFile, []byte(`{bad`), 0o644))
 
 		cmd.SetArgs([]string{tmpFile})
 		err := cmd.Execute()
@@ -81,8 +81,8 @@ func TestDiffCmd(t *testing.T) {
 		dir := t.TempDir()
 		f1 := filepath.Join(dir, "a.json")
 		f2 := filepath.Join(dir, "b.json")
-		require.NoError(t, os.WriteFile(f1, []byte(`{"a":1}`), 0644))
-		require.NoError(t, os.WriteFile(f2, []byte(`{"a":1}`), 0644))
+		require.NoError(t, os.WriteFile(f1, []byte(`{"a":1}`), 0o644))
+		require.NoError(t, os.WriteFile(f2, []byte(`{"a":1}`), 0o644))
 
 		cmd.SetArgs([]string{f1, f2})
 		err := cmd.Execute()
@@ -93,8 +93,8 @@ func TestDiffCmd(t *testing.T) {
 		dir := t.TempDir()
 		f1 := filepath.Join(dir, "a.json")
 		f2 := filepath.Join(dir, "b.json")
-		require.NoError(t, os.WriteFile(f1, []byte(`{"a":1}`), 0644))
-		require.NoError(t, os.WriteFile(f2, []byte(`{"a":2}`), 0644))
+		require.NoError(t, os.WriteFile(f1, []byte(`{"a":1}`), 0o644))
+		require.NoError(t, os.WriteFile(f2, []byte(`{"a":2}`), 0o644))
 
 		cmd.SetArgs([]string{f1, f2})
 		err := cmd.Execute()
@@ -105,8 +105,8 @@ func TestDiffCmd(t *testing.T) {
 		dir := t.TempDir()
 		f1 := filepath.Join(dir, "a.json")
 		f2 := filepath.Join(dir, "b.json")
-		require.NoError(t, os.WriteFile(f1, []byte(`{"a":{"b":1}}`), 0644))
-		require.NoError(t, os.WriteFile(f2, []byte(`{"a":{"b":2}}`), 0644))
+		require.NoError(t, os.WriteFile(f1, []byte(`{"a":{"b":1}}`), 0o644))
+		require.NoError(t, os.WriteFile(f2, []byte(`{"a":{"b":2}}`), 0o644))
 
 		cmd.SetArgs([]string{f1, f2})
 		err := cmd.Execute()

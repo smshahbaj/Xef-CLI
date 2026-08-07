@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
+	"github.com/smshahbaj/Xef-CLI/internal/infrastructure/filesystem"
 	"github.com/stretchr/testify/assert"
-	"github.com/xef/xefcli/internal/core/logger"
-	"github.com/xef/xefcli/internal/infrastructure/filesystem"
 )
 
 func TestNewCommand(t *testing.T) {

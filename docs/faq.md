@@ -12,7 +12,7 @@ Yes, XefCLI is open source under the MIT license.
 
 ### How do I install XefCLI?
 ```bash
-go install github.com/xef/xefcli/cmd/xefcli@latest
+go install github.com/smshahbaj/Xef-CLI/cmd/xefcli@latest
 ```
 
 ### What Go version is required?

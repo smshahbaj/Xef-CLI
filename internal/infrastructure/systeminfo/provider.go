@@ -10,7 +10,7 @@ import (
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/mem"
 	"github.com/shirou/gopsutil/v3/net"
-	"github.com/xef/xefcli/internal/core/interfaces"
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
 )
 
 // GopsutilProvider implements SystemInfoProvider using gopsutil.

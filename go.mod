@@ -1,4 +1,4 @@
-module github.com/xef/xefcli
+module github.com/smshahbaj/Xef-CLI
 
 go 1.22
 

@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/smshahbaj/Xef-CLI/internal/app"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xef/xefcli/internal/app"
 )
 
 func TestRootCommandConstructsAndVersionWorks(t *testing.T) {

@@ -27,10 +27,10 @@ type FileSystem interface {
 type FileInfo struct {
 	Name    string
 	Path    string
-	Size    int64
-	IsDir   bool
 	ModTime int64
+	Size    int64
 	Mode    uint32
+	IsDir   bool
 }
 
 // Hasher provides cryptographic hashing.
@@ -50,9 +50,9 @@ type HTTPClient interface {
 
 // HTTPResponse represents an HTTP response.
 type HTTPResponse struct {
-	StatusCode int
 	Headers    map[string]string
 	Body       []byte
+	StatusCode int
 }
 
 // SystemInfoProvider retrieves system information.
@@ -83,11 +83,11 @@ type MemoryInfo struct {
 // DiskInfo holds disk information.
 type DiskInfo struct {
 	Path        string
-	Total       uint64
-	Free        uint64
-	Used        uint64
-	UsedPercent float64
 	FSType      string
+	Total       uint64
+	Used        uint64
+	Free        uint64
+	UsedPercent float64
 }
 
 // NetworkInterface holds network interface information.

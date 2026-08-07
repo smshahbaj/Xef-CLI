@@ -4,22 +4,22 @@ import (
 	"context"
 	"io"
 
-	"github.com/xef/xefcli/internal/core/interfaces"
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
 )
 
 // MockHTTPClient is a test double for HTTPClient.
 type MockHTTPClient struct {
-	GetResponse      *interfaces.HTTPResponse
-	GetError         error
-	PostResponse     *interfaces.HTTPResponse
-	PostError        error
-	DownloadError    error
-	LastURL          string
-	LastDest         string
+	GetResponse   *interfaces.HTTPResponse
+	GetError      error
+	PostResponse  *interfaces.HTTPResponse
+	PostError     error
+	DownloadError error
+	LastURL       string
+	LastDest      string
 }
 
 // Get performs a mock GET request.
-func (m *MockHTTPClient) Get(ctx context.Context, url string, headers map[string]string) (*interfaces.HTTPResponse, error) {
+func (m *MockHTTPClient) Get(_ context.Context, url string, _ map[string]string) (*interfaces.HTTPResponse, error) {
 	m.LastURL = url
 	if m.GetError != nil {
 		return nil, m.GetError
@@ -28,7 +28,7 @@ func (m *MockHTTPClient) Get(ctx context.Context, url string, headers map[string
 }
 
 // Post performs a mock POST request.
-func (m *MockHTTPClient) Post(ctx context.Context, url string, body io.Reader, headers map[string]string) (*interfaces.HTTPResponse, error) {
+func (m *MockHTTPClient) Post(_ context.Context, url string, _ io.Reader, _ map[string]string) (*interfaces.HTTPResponse, error) {
 	m.LastURL = url
 	if m.PostError != nil {
 		return nil, m.PostError
@@ -37,7 +37,7 @@ func (m *MockHTTPClient) Post(ctx context.Context, url string, body io.Reader, h
 }
 
 // Download performs a mock download.
-func (m *MockHTTPClient) Download(ctx context.Context, url, dest string, headers map[string]string) error {
+func (m *MockHTTPClient) Download(_ context.Context, url, dest string, _ map[string]string) error {
 	m.LastURL = url
 	m.LastDest = dest
 	if m.DownloadError != nil {

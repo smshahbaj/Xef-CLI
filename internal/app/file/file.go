@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -13,15 +14,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
+	"github.com/smshahbaj/Xef-CLI/internal/pkg/tui"
+	"github.com/smshahbaj/Xef-CLI/internal/pkg/utils"
 	"github.com/spf13/cobra"
-	"github.com/xef/xefcli/internal/core/interfaces"
-	"github.com/xef/xefcli/internal/core/logger"
-	"github.com/xef/xefcli/internal/pkg/tui"
-	"github.com/xef/xefcli/internal/pkg/utils"
 )
 
-// hashSize is the size of a SHA-256 hash string in hex.
-const hashSize = 64
+// (removed unused hashSize)
 
 // NewCommand creates the file command group.
 func NewCommand(fs interfaces.FileSystem, log logger.Logger) *cobra.Command {
@@ -48,7 +48,7 @@ func newOrganizeCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Command 
 		Example: `  xef file organize ~/Downloads --by extension
   xef file organize ~/Downloads --by date --dry-run`,
 		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			dir := args[0]
 			if !fs.Exists(dir) {
 				return fmt.Errorf("directory not found: %s", dir)
@@ -91,7 +91,7 @@ func newOrganizeCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Command 
 					continue
 				}
 
-				if err := fs.MkdirAll(targetDir, 0755); err != nil {
+				if err := fs.MkdirAll(targetDir, 0o755); err != nil {
 					log.Warn("failed to create directory", logger.String("path", targetDir), logger.Error(err))
 					continue
 				}
@@ -118,13 +118,13 @@ func newOrganizeCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Command 
 	return cmd
 }
 
-func newStatsCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Command {
+func newStatsCmd(fs interfaces.FileSystem, _ logger.Logger) *cobra.Command {
 	return &cobra.Command{
 		Use:     "stats [path]",
 		Short:   "Show file and directory statistics",
 		Example: `  xef file stats ./my-project`,
 		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			path := args[0]
 			if !fs.Exists(path) {
 				return fmt.Errorf("path not found: %s", path)
@@ -139,7 +139,7 @@ func newStatsCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Command {
 			)
 
 			start := time.Now()
-			err := fs.WalkDir(path, func(p string, info interfaces.FileInfo, err error) error {
+			err := fs.WalkDir(path, func(_ string, info interfaces.FileInfo, err error) error {
 				if err != nil {
 					return nil
 				}
@@ -207,7 +207,7 @@ func newDuplicatesCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Comman
 		Short:   "Find duplicate files by content hash",
 		Example: `  xef file duplicates ~/Downloads --min-size 1024`,
 		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			dir := args[0]
 			if !fs.Exists(dir) {
 				return fmt.Errorf("directory not found: %s", dir)
@@ -299,12 +299,16 @@ func newDuplicatesCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Comman
 }
 
 // hashFile computes the SHA-256 hash of a file using streaming to handle large files.
-func hashFile(fs interfaces.FileSystem, path string) (string, error) {
+func hashFile(_ interfaces.FileSystem, path string) (string, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return "", fmt.Errorf("failed to open file: %w", err)
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			log.Printf("error closing file %s: %v", path, err)
+		}
+	}()
 
 	h := sha256.New()
 	if _, err := io.Copy(h, f); err != nil {

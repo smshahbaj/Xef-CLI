@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/xef/xefcli/internal/core/interfaces"
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
 )
 
 // OSFileSystem implements FileSystem using the OS.

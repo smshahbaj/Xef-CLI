@@ -138,9 +138,9 @@ func Table(headers []string, rows [][]string) string {
 		}
 		sb.WriteString(Styles.TableHeader.Render(fmt.Sprintf("%-*s", widths[i], h)))
 	}
-sb.WriteString("\n")
-sb.WriteString(strings.Repeat("-", sum(widths)+3*(len(headers)-1)))
-sb.WriteString("\n")
+	sb.WriteString("\n")
+	sb.WriteString(strings.Repeat("-", sum(widths)+3*(len(headers)-1)))
+	sb.WriteString("\n")
 
 	// Rows
 	for _, row := range rows {

@@ -10,21 +10,23 @@ import (
 // ExitCode represents a process exit code.
 type ExitCode int
 
+// Exit codes used by the application.
 const (
-	ExitSuccess       ExitCode = 0
-	ExitGeneralError  ExitCode = 1
-	ExitInvalidInput  ExitCode = 2
-	ExitNotFound      ExitCode = 3
-	ExitPermission    ExitCode = 4
-	ExitTimeout       ExitCode = 5
-	ExitInterrupted   ExitCode = 130
+	// ExitSuccess indicates successful execution.
+	ExitSuccess      ExitCode = 0
+	ExitGeneralError ExitCode = 1
+	ExitInvalidInput ExitCode = 2
+	ExitNotFound     ExitCode = 3
+	ExitPermission   ExitCode = 4
+	ExitTimeout      ExitCode = 5
+	ExitInterrupted  ExitCode = 130
 )
 
 // AppError is the base application error type.
 type AppError struct {
-	Code    ExitCode
-	Message string
 	Cause   error
+	Message string
+	Code    ExitCode
 }
 
 func (e *AppError) Error() string {

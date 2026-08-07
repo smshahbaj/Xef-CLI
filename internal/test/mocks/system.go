@@ -3,23 +3,25 @@ package mocks
 import (
 	"context"
 
-	"github.com/xef/xefcli/internal/core/interfaces"
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
 )
 
 // MockSystemProvider is a test double for SystemInfoProvider.
+//
+//nolint:govet // fieldalignment: layout is intentional for test doubles
 type MockSystemProvider struct {
-	CPUInfoResult      *interfaces.CPUInfo
-	CPUInfoError       error
-	MemoryInfoResult   *interfaces.MemoryInfo
-	MemoryInfoError    error
-	DiskInfoResult     []interfaces.DiskInfo
-	DiskInfoError      error
-	NetworkInfoResult  []interfaces.NetworkInterface
-	NetworkInfoError   error
+	CPUInfoResult     *interfaces.CPUInfo
+	CPUInfoError      error
+	MemoryInfoResult  *interfaces.MemoryInfo
+	MemoryInfoError   error
+	DiskInfoResult    []interfaces.DiskInfo
+	DiskInfoError     error
+	NetworkInfoResult []interfaces.NetworkInterface
+	NetworkInfoError  error
 }
 
 // CPUInfo returns mock CPU info.
-func (m *MockSystemProvider) CPUInfo(ctx context.Context) (*interfaces.CPUInfo, error) {
+func (m *MockSystemProvider) CPUInfo(_ context.Context) (*interfaces.CPUInfo, error) {
 	if m.CPUInfoError != nil {
 		return nil, m.CPUInfoError
 	}
@@ -27,7 +29,7 @@ func (m *MockSystemProvider) CPUInfo(ctx context.Context) (*interfaces.CPUInfo, 
 }
 
 // MemoryInfo returns mock memory info.
-func (m *MockSystemProvider) MemoryInfo(ctx context.Context) (*interfaces.MemoryInfo, error) {
+func (m *MockSystemProvider) MemoryInfo(_ context.Context) (*interfaces.MemoryInfo, error) {
 	if m.MemoryInfoError != nil {
 		return nil, m.MemoryInfoError
 	}
@@ -35,7 +37,7 @@ func (m *MockSystemProvider) MemoryInfo(ctx context.Context) (*interfaces.Memory
 }
 
 // DiskInfo returns mock disk info.
-func (m *MockSystemProvider) DiskInfo(ctx context.Context) ([]interfaces.DiskInfo, error) {
+func (m *MockSystemProvider) DiskInfo(_ context.Context) ([]interfaces.DiskInfo, error) {
 	if m.DiskInfoError != nil {
 		return nil, m.DiskInfoError
 	}
@@ -43,7 +45,7 @@ func (m *MockSystemProvider) DiskInfo(ctx context.Context) ([]interfaces.DiskInf
 }
 
 // NetworkInfo returns mock network info.
-func (m *MockSystemProvider) NetworkInfo(ctx context.Context) ([]interfaces.NetworkInterface, error) {
+func (m *MockSystemProvider) NetworkInfo(_ context.Context) ([]interfaces.NetworkInterface, error) {
 	if m.NetworkInfoError != nil {
 		return nil, m.NetworkInfoError
 	}

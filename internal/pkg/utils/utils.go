@@ -60,7 +60,7 @@ func SafeFileName(name string) string {
 
 // EnsureDir ensures a directory exists.
 func EnsureDir(path string) error {
-	return os.MkdirAll(path, 0755)
+	return os.MkdirAll(path, 0o755)
 }
 
 // FileExists checks if a file exists.
@@ -98,9 +98,9 @@ func ProgressPercentage(current, total int64) float64 {
 }
 
 // SplitExt splits a filename into name and extension.
-func SplitExt(filename string) (string, string) {
-	ext := filepath.Ext(filename)
-	name := strings.TrimSuffix(filename, ext)
+func SplitExt(filename string) (name, ext string) {
+	ext = filepath.Ext(filename)
+	name = strings.TrimSuffix(filename, ext)
 	return name, ext
 }
 

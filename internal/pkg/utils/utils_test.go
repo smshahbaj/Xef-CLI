@@ -9,15 +9,15 @@ import (
 
 func TestFormatBytes(t *testing.T) {
 	tests := []struct {
-		bytes uint64
 		want  string
+		bytes uint64
 	}{
-		{0, "0 B"},
-		{512, "512 B"},
-		{1024, "1.0 KB"},
-		{1536, "1.5 KB"},
-		{1024 * 1024, "1.0 MB"},
-		{1024 * 1024 * 1024, "1.0 GB"},
+		{want: "0 B", bytes: 0},
+		{want: "512 B", bytes: 512},
+		{want: "1.0 KB", bytes: 1024},
+		{want: "1.5 KB", bytes: 1536},
+		{want: "1.0 MB", bytes: 1024 * 1024},
+		{want: "1.0 GB", bytes: 1024 * 1024 * 1024},
 	}
 
 	for _, tt := range tests {
@@ -29,13 +29,13 @@ func TestFormatBytes(t *testing.T) {
 
 func TestFormatDuration(t *testing.T) {
 	tests := []struct {
-		d    time.Duration
 		want string
+		d    time.Duration
 	}{
-		{100 * time.Microsecond, "100.00µs"},
-		{100 * time.Millisecond, "100.00ms"},
-		{2 * time.Second, "2.00s"},
-		{90 * time.Second, "1m30s"},
+		{want: "100.00µs", d: 100 * time.Microsecond},
+		{want: "100.00ms", d: 100 * time.Millisecond},
+		{want: "2.00s", d: 2 * time.Second},
+		{want: "1m30s", d: 90 * time.Second},
 	}
 
 	for _, tt := range tests {

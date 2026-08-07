@@ -10,9 +10,9 @@ import (
 	"strings"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
+	"github.com/smshahbaj/Xef-CLI/internal/pkg/tui"
 	"github.com/spf13/cobra"
-	"github.com/xef/xefcli/internal/core/logger"
-	"github.com/xef/xefcli/internal/pkg/tui"
 )
 
 // NewCommand creates the git command group.
@@ -28,12 +28,12 @@ func NewCommand(log logger.Logger) *cobra.Command {
 	return cmd
 }
 
-func newStatsCmd(log logger.Logger) *cobra.Command {
+func newStatsCmd(_ logger.Logger) *cobra.Command {
 	return &cobra.Command{
 		Use:     "stats",
 		Short:   "Show Git repository statistics",
 		Example: `  xef git stats`,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if !isGitRepo() {
 				return fmt.Errorf("not a git repository")
 			}
@@ -73,12 +73,12 @@ func newStatsCmd(log logger.Logger) *cobra.Command {
 	}
 }
 
-func newBranchesCmd(log logger.Logger) *cobra.Command {
+func newBranchesCmd(_ logger.Logger) *cobra.Command {
 	return &cobra.Command{
 		Use:     "branches",
 		Short:   "List branches with last commit info",
 		Example: `  xef git branches`,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if !isGitRepo() {
 				return fmt.Errorf("not a git repository")
 			}

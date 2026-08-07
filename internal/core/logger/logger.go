@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"sync"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -15,19 +14,25 @@ import (
 // LogLevel represents the severity of a log entry.
 type LogLevel string
 
+// Standard log levels used by the logger.
 const (
+	// DebugLevel enables verbose debugging output.
 	DebugLevel LogLevel = "debug"
-	InfoLevel  LogLevel = "info"
-	WarnLevel  LogLevel = "warn"
+	// InfoLevel is the default informational logging level.
+	InfoLevel LogLevel = "info"
+	// WarnLevel indicates non-fatal warnings.
+	WarnLevel LogLevel = "warn"
+	// ErrorLevel indicates errors requiring attention.
 	ErrorLevel LogLevel = "error"
+	// FatalLevel indicates unrecoverable errors that will exit.
 	FatalLevel LogLevel = "fatal"
 )
 
 // Config holds logger configuration.
 type Config struct {
-	Level      LogLevel
-	Format     string // json or pretty
-	Output     string // stdout, stderr, or file path
+	Level       LogLevel
+	Format      string // json or pretty
+	Output      string // stdout, stderr, or file path
 	Development bool
 }
 
@@ -44,8 +49,8 @@ type Logger interface {
 
 // Field represents a structured log field.
 type Field struct {
-	Key   string
 	Value interface{}
+	Key   string
 }
 
 // String creates a string field.
@@ -81,7 +86,6 @@ func Error(err error) Field {
 // zapLogger implements Logger using zap.
 type zapLogger struct {
 	*zap.SugaredLogger
-	mu sync.RWMutex
 }
 
 // New creates a new Logger from Config.
@@ -92,7 +96,7 @@ func New(cfg Config) (Logger, error) {
 	}
 
 	var encoder zapcore.Encoder
-	if strings.ToLower(cfg.Format) == "json" {
+	if strings.EqualFold(cfg.Format, "json") {
 		encoder = zapcore.NewJSONEncoder(encoderConfig(cfg.Development))
 	} else {
 		encoder = zapcore.NewConsoleEncoder(encoderConfig(cfg.Development))
@@ -105,7 +109,7 @@ func New(cfg Config) (Logger, error) {
 	case "stdout", "":
 		writeSyncer = zapcore.AddSync(os.Stdout)
 	default:
-		f, err := os.OpenFile(cfg.Output, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		f, err := os.OpenFile(cfg.Output, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 		if err != nil {
 			return nil, fmt.Errorf("failed to open log file: %w", err)
 		}

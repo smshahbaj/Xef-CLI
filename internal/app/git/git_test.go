@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xef/xefcli/internal/core/logger"
 )
 
 func TestGitCommandsWithTemporaryRepo(t *testing.T) {

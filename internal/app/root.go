@@ -4,21 +4,21 @@ package app
 import (
 	"fmt"
 
+	appcrypto "github.com/smshahbaj/Xef-CLI/internal/app/crypto"
+	"github.com/smshahbaj/Xef-CLI/internal/app/dev"
+	"github.com/smshahbaj/Xef-CLI/internal/app/file"
+	"github.com/smshahbaj/Xef-CLI/internal/app/git"
+	apphttp "github.com/smshahbaj/Xef-CLI/internal/app/http"
+	"github.com/smshahbaj/Xef-CLI/internal/app/json"
+	"github.com/smshahbaj/Xef-CLI/internal/app/system"
+	"github.com/smshahbaj/Xef-CLI/internal/core/config"
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
+	infracrypto "github.com/smshahbaj/Xef-CLI/internal/infrastructure/crypto"
+	"github.com/smshahbaj/Xef-CLI/internal/infrastructure/filesystem"
+	"github.com/smshahbaj/Xef-CLI/internal/infrastructure/network"
+	"github.com/smshahbaj/Xef-CLI/internal/infrastructure/systeminfo"
+	"github.com/smshahbaj/Xef-CLI/internal/pkg/tui"
 	"github.com/spf13/cobra"
-	appcrypto "github.com/xef/xefcli/internal/app/crypto"
-	"github.com/xef/xefcli/internal/app/dev"
-	"github.com/xef/xefcli/internal/app/file"
-	"github.com/xef/xefcli/internal/app/git"
-	apphttp "github.com/xef/xefcli/internal/app/http"
-	"github.com/xef/xefcli/internal/app/json"
-	"github.com/xef/xefcli/internal/app/system"
-	"github.com/xef/xefcli/internal/core/config"
-	"github.com/xef/xefcli/internal/core/logger"
-	infracrypto "github.com/xef/xefcli/internal/infrastructure/crypto"
-	"github.com/xef/xefcli/internal/infrastructure/filesystem"
-	"github.com/xef/xefcli/internal/infrastructure/network"
-	"github.com/xef/xefcli/internal/infrastructure/systeminfo"
-	"github.com/xef/xefcli/internal/pkg/tui"
 )
 
 // App holds application dependencies.
@@ -46,7 +46,7 @@ func New(version string) *App {
 It provides powerful tools for file management, data processing, cryptography,
 HTTP operations, system monitoring, and development workflows.`,
 		Version: version,
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			cfgFile, _ := cmd.Flags().GetString("config")
 			if err := cfg.Load(cfgFile); err != nil {
 				return fmt.Errorf("failed to load config: %w", err)
@@ -78,13 +78,13 @@ HTTP operations, system monitoring, and development workflows.`,
 	sysProvider := systeminfo.NewGopsutilProvider()
 
 	// Register domain commands
-	app.RootCmd.AddCommand(file.NewCommand(fs, log))
-	app.RootCmd.AddCommand(json.NewCommand(log))
-	app.RootCmd.AddCommand(appcrypto.NewCommand(hasher, log))
-	app.RootCmd.AddCommand(apphttp.NewCommand(httpClient, log))
-	app.RootCmd.AddCommand(git.NewCommand(log))
-	app.RootCmd.AddCommand(system.NewCommand(sysProvider, log))
-	app.RootCmd.AddCommand(dev.NewCommand(fs, log))
+	app.RootCmd.AddCommand(file.NewCommand(fs, app.Logger))
+	app.RootCmd.AddCommand(json.NewCommand(app.Logger))
+	app.RootCmd.AddCommand(appcrypto.NewCommand(hasher, app.Logger))
+	app.RootCmd.AddCommand(apphttp.NewCommand(httpClient, app.Logger))
+	app.RootCmd.AddCommand(git.NewCommand(app.Logger))
+	app.RootCmd.AddCommand(system.NewCommand(sysProvider, app.Logger))
+	app.RootCmd.AddCommand(dev.NewCommand(fs, app.Logger))
 
 	app.RootCmd.SetUsageTemplate(usageTemplate())
 	return app

@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/smshahbaj/Xef-CLI/internal/core/interfaces"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xef/xefcli/internal/core/interfaces"
 )
 
 func TestOSFileSystem(t *testing.T) {
@@ -17,8 +17,7 @@ func TestOSFileSystem(t *testing.T) {
 		path := filepath.Join(tmpDir, "test.txt")
 		data := []byte("hello world")
 
-		err := fsys.WriteFile(path, data, 0644)
-		require.NoError(t, err)
+		require.NoError(t, fsys.WriteFile(path, data, 0o644))
 
 		read, err := fsys.ReadFile(path)
 		require.NoError(t, err)
@@ -27,23 +26,23 @@ func TestOSFileSystem(t *testing.T) {
 
 	t.Run("Exists", func(t *testing.T) {
 		path := filepath.Join(tmpDir, "exists.txt")
-		fsys.WriteFile(path, []byte("test"), 0644)
+		require.NoError(t, fsys.WriteFile(path, []byte("test"), 0o644))
 		assert.True(t, fsys.Exists(path))
 		assert.False(t, fsys.Exists(filepath.Join(tmpDir, "notexists.txt")))
 	})
 
 	t.Run("IsDir", func(t *testing.T) {
 		dir := filepath.Join(tmpDir, "subdir")
-		fsys.MkdirAll(dir, 0755)
+		require.NoError(t, fsys.MkdirAll(dir, 0o755))
 		assert.True(t, fsys.IsDir(dir))
 		assert.False(t, fsys.IsDir(filepath.Join(dir, "file.txt")))
 	})
 
 	t.Run("ListDir", func(t *testing.T) {
 		dir := filepath.Join(tmpDir, "listdir")
-		fsys.MkdirAll(dir, 0755)
-		fsys.WriteFile(filepath.Join(dir, "a.txt"), []byte("a"), 0644)
-		fsys.WriteFile(filepath.Join(dir, "b.txt"), []byte("b"), 0644)
+		require.NoError(t, fsys.MkdirAll(dir, 0o755))
+		require.NoError(t, fsys.WriteFile(filepath.Join(dir, "a.txt"), []byte("a"), 0o644))
+		require.NoError(t, fsys.WriteFile(filepath.Join(dir, "b.txt"), []byte("b"), 0o644))
 
 		entries, err := fsys.ListDir(dir)
 		require.NoError(t, err)
@@ -52,7 +51,7 @@ func TestOSFileSystem(t *testing.T) {
 
 	t.Run("Remove", func(t *testing.T) {
 		path := filepath.Join(tmpDir, "remove.txt")
-		fsys.WriteFile(path, []byte("test"), 0644)
+		require.NoError(t, fsys.WriteFile(path, []byte("test"), 0o644))
 		assert.True(t, fsys.Exists(path))
 
 		err := fsys.Remove(path)
@@ -62,12 +61,15 @@ func TestOSFileSystem(t *testing.T) {
 
 	t.Run("WalkDir", func(t *testing.T) {
 		dir := filepath.Join(tmpDir, "walkdir")
-		fsys.MkdirAll(filepath.Join(dir, "sub"), 0755)
-		fsys.WriteFile(filepath.Join(dir, "root.txt"), []byte("root"), 0644)
-		fsys.WriteFile(filepath.Join(dir, "sub", "nested.txt"), []byte("nested"), 0644)
+		require.NoError(t, fsys.MkdirAll(filepath.Join(dir, "sub"), 0o755))
+		require.NoError(t, fsys.WriteFile(filepath.Join(dir, "root.txt"), []byte("root"), 0o644))
+		require.NoError(t, fsys.WriteFile(filepath.Join(dir, "sub", "nested.txt"), []byte("nested"), 0o644))
 
 		var count int
-		err := fsys.WalkDir(dir, func(path string, info interfaces.FileInfo, err error) error {
+		err := fsys.WalkDir(dir, func(_ string, _ interfaces.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
 			count++
 			return nil
 		})

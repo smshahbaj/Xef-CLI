@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
+	"github.com/smshahbaj/Xef-CLI/internal/pkg/tui"
 	"github.com/spf13/cobra"
-	"github.com/xef/xefcli/internal/core/logger"
-	"github.com/xef/xefcli/internal/pkg/tui"
 )
 
 // NewCommand creates the json command group.
@@ -26,7 +26,7 @@ func NewCommand(log logger.Logger) *cobra.Command {
 	return cmd
 }
 
-func newFormatCmd(log logger.Logger) *cobra.Command {
+func newFormatCmd(_ logger.Logger) *cobra.Command {
 	var indent string
 	var compact bool
 
@@ -35,7 +35,7 @@ func newFormatCmd(log logger.Logger) *cobra.Command {
 		Short:   "Format JSON file or stdin",
 		Example: `  xef json format data.json --indent "  "`,
 		Args:    cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			var data []byte
 			var err error
 
@@ -52,7 +52,7 @@ func newFormatCmd(log logger.Logger) *cobra.Command {
 			}
 
 			var obj interface{}
-			if err := json.Unmarshal(data, &obj); err != nil {
+			if err = json.Unmarshal(data, &obj); err != nil {
 				return fmt.Errorf("invalid JSON: %w", err)
 			}
 
@@ -76,13 +76,13 @@ func newFormatCmd(log logger.Logger) *cobra.Command {
 	return cmd
 }
 
-func newValidateCmd(log logger.Logger) *cobra.Command {
+func newValidateCmd(_ logger.Logger) *cobra.Command {
 	return &cobra.Command{
 		Use:     "validate [file]",
 		Short:   "Validate JSON file or stdin",
 		Example: `  xef json validate data.json`,
 		Args:    cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			var data []byte
 			var err error
 
@@ -110,13 +110,13 @@ func newValidateCmd(log logger.Logger) *cobra.Command {
 	}
 }
 
-func newDiffCmd(log logger.Logger) *cobra.Command {
+func newDiffCmd(_ logger.Logger) *cobra.Command {
 	return &cobra.Command{
 		Use:     "diff [file1] [file2]",
 		Short:   "Show differences between two JSON files",
 		Example: `  xef json diff config.prod.json config.dev.json`,
 		Args:    cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, args []string) error {
 			data1, err := os.ReadFile(args[0])
 			if err != nil {
 				return fmt.Errorf("failed to read %s: %w", args[0], err)
@@ -193,11 +193,12 @@ func diffMaps(prefix string, m1, m2 map[string]interface{}) []string {
 		v1, ok1 := m1[k]
 		v2, ok2 := m2[k]
 
-		if !ok1 {
+		switch {
+		case !ok1:
 			diffs = append(diffs, fmt.Sprintf("+ %s: %v", path, v2))
-		} else if !ok2 {
+		case !ok2:
 			diffs = append(diffs, fmt.Sprintf("- %s: %v", path, v1))
-		} else {
+		default:
 			diffs = append(diffs, diffValue(path, v1, v2)...)
 		}
 	}
@@ -213,11 +214,12 @@ func diffArrays(prefix string, a1, a2 []interface{}) []string {
 
 	for i := 0; i < maxLen; i++ {
 		path := fmt.Sprintf("%s[%d]", prefix, i)
-		if i >= len(a1) {
+		switch {
+		case i >= len(a1):
 			diffs = append(diffs, fmt.Sprintf("+ %s: %v", path, a2[i]))
-		} else if i >= len(a2) {
+		case i >= len(a2):
 			diffs = append(diffs, fmt.Sprintf("- %s: %v", path, a1[i]))
-		} else {
+		default:
 			diffs = append(diffs, diffValue(path, a1[i], a2[i])...)
 		}
 	}
