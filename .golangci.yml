@@ -18,6 +18,17 @@ linters:
   settings:
     govet:
       enable-all: true
+    staticcheck:
+      checks:
+        - all
+        - "-QF1008"
+    revive:
+      rules:
+        - name: var-naming
+          disabled: true
+  exclusions:
+    presets:
+      - std-error-handling
 
 formatters:
   enable:
