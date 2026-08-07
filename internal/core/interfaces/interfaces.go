@@ -1,6 +1,4 @@
 // Package interfaces defines core abstractions used across XefCLI.
-//
-//nolint:revive // ignore meaningless package name warning for interfaces
 package interfaces
 
 import (

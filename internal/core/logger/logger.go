@@ -165,23 +165,23 @@ func encoderConfig(dev bool) zapcore.EncoderConfig {
 }
 
 func (l *zapLogger) Debug(msg string, fields ...Field) {
-	l.Debugw(msg, toArgs(fields...)...)
+	l.SugaredLogger.Debugw(msg, toArgs(fields...)...)
 }
 
 func (l *zapLogger) Info(msg string, fields ...Field) {
-	l.Infow(msg, toArgs(fields...)...)
+	l.SugaredLogger.Infow(msg, toArgs(fields...)...)
 }
 
 func (l *zapLogger) Warn(msg string, fields ...Field) {
-	l.Warnw(msg, toArgs(fields...)...)
+	l.SugaredLogger.Warnw(msg, toArgs(fields...)...)
 }
 
 func (l *zapLogger) Error(msg string, fields ...Field) {
-	l.Errorw(msg, toArgs(fields...)...)
+	l.SugaredLogger.Errorw(msg, toArgs(fields...)...)
 }
 
 func (l *zapLogger) Fatal(msg string, fields ...Field) {
-	l.Fatalw(msg, toArgs(fields...)...)
+	l.SugaredLogger.Fatalw(msg, toArgs(fields...)...)
 }
 
 func (l *zapLogger) With(fields ...Field) Logger {

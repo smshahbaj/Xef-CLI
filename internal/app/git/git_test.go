@@ -48,7 +48,7 @@ func TestGitCommandsWithEmptyRepo(t *testing.T) {
 	t.Cleanup(func() {
 		_ = os.RemoveAll(repoDir)
 	})
-	cmd := exec.CommandContext(t.Context(), "git", "init")
+	cmd := exec.Command("git", "init")
 	cmd.Dir = repoDir
 	require.NoError(t, cmd.Run())
 
@@ -97,26 +97,26 @@ func createTempGitRepo(t *testing.T) string {
 	t.Helper()
 
 	repoDir := t.TempDir()
-	cmd := exec.CommandContext(t.Context(), "git", "init")
+	cmd := exec.Command("git", "init")
 	cmd.Dir = repoDir
 	require.NoError(t, cmd.Run())
 
-	cmd = exec.CommandContext(t.Context(), "git", "config", "user.name", "Test User")
+	cmd = exec.Command("git", "config", "user.name", "Test User")
 	cmd.Dir = repoDir
 	require.NoError(t, cmd.Run())
 
-	cmd = exec.CommandContext(t.Context(), "git", "config", "user.email", "test@example.com")
+	cmd = exec.Command("git", "config", "user.email", "test@example.com")
 	cmd.Dir = repoDir
 	require.NoError(t, cmd.Run())
 
 	filePath := filepath.Join(repoDir, "README.md")
 	require.NoError(t, os.WriteFile(filePath, []byte("hello\n"), 0o644))
 
-	cmd = exec.CommandContext(t.Context(), "git", "add", "README.md")
+	cmd = exec.Command("git", "add", "README.md")
 	cmd.Dir = repoDir
 	require.NoError(t, cmd.Run())
 
-	cmd = exec.CommandContext(t.Context(), "git", "commit", "-m", "initial commit")
+	cmd = exec.Command("git", "commit", "-m", "initial commit")
 	cmd.Dir = repoDir
 	require.NoError(t, cmd.Run())
 
@@ -133,6 +133,6 @@ func TestCreateTempGitRepo(t *testing.T) {
 	assert.NoError(t, err)
 	_, err = os.Stat(filepath.Join(repoDir, "README.md"))
 	assert.NoError(t, err)
-	_, err = exec.CommandContext(t.Context(), "git", "-C", repoDir, "rev-parse", "HEAD").CombinedOutput()
+	_, err = exec.Command("git", "-C", repoDir, "rev-parse", "HEAD").CombinedOutput()
 	assert.NoError(t, err, fmt.Sprintf("expected commit in %s", repoDir))
 }

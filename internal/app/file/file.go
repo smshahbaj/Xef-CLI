@@ -21,22 +21,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// (removed unused hashSize)
+
 // NewCommand creates the file command group.
-func NewCommand(fs interfaces.FileSystem, lg logger.Logger) *cobra.Command {
+func NewCommand(fs interfaces.FileSystem, log logger.Logger) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "file",
 		Short: "File management tools",
 		Long:  "Organize, analyze, and manipulate files and directories.",
 	}
 
-	cmd.AddCommand(newOrganizeCmd(fs, lg))
-	cmd.AddCommand(newStatsCmd(fs, lg))
-	cmd.AddCommand(newDuplicatesCmd(fs, lg))
-	cmd.AddCommand(newCleanCmd(fs, lg))
+	cmd.AddCommand(newOrganizeCmd(fs, log))
+	cmd.AddCommand(newStatsCmd(fs, log))
+	cmd.AddCommand(newDuplicatesCmd(fs, log))
+	cmd.AddCommand(newCleanCmd(fs, log))
 	return cmd
 }
 
-func newOrganizeCmd(fs interfaces.FileSystem, lg logger.Logger) *cobra.Command {
+func newOrganizeCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Command {
 	var dryRun bool
 	var by string
 
@@ -55,7 +57,7 @@ func newOrganizeCmd(fs interfaces.FileSystem, lg logger.Logger) *cobra.Command {
 				return fmt.Errorf("path is not a directory: %s", dir)
 			}
 
-			lg.Info("organizing files", logger.String("directory", dir), logger.String("by", by))
+			log.Info("organizing files", logger.String("directory", dir), logger.String("by", by))
 
 			entries, err := fs.ListDir(dir)
 			if err != nil {
@@ -85,18 +87,18 @@ func newOrganizeCmd(fs interfaces.FileSystem, lg logger.Logger) *cobra.Command {
 				}
 
 				if dryRun {
-					lg.Info("would move", logger.String("from", entry.Path), logger.String("to", targetDir))
+					log.Info("would move", logger.String("from", entry.Path), logger.String("to", targetDir))
 					continue
 				}
 
 				if err := fs.MkdirAll(targetDir, 0o755); err != nil {
-					lg.Warn("failed to create directory", logger.String("path", targetDir), logger.Error(err))
+					log.Warn("failed to create directory", logger.String("path", targetDir), logger.Error(err))
 					continue
 				}
 
 				newPath := filepath.Join(targetDir, entry.Name)
 				if err := os.Rename(entry.Path, newPath); err != nil {
-					lg.Warn("failed to move file", logger.String("file", entry.Name), logger.Error(err))
+					log.Warn("failed to move file", logger.String("file", entry.Name), logger.Error(err))
 					continue
 				}
 				moved++
@@ -196,7 +198,7 @@ func newStatsCmd(fs interfaces.FileSystem, _ logger.Logger) *cobra.Command {
 	}
 }
 
-func newDuplicatesCmd(fs interfaces.FileSystem, lg logger.Logger) *cobra.Command {
+func newDuplicatesCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Command {
 	var minSize int64
 	var workers int
 
@@ -214,7 +216,7 @@ func newDuplicatesCmd(fs interfaces.FileSystem, lg logger.Logger) *cobra.Command
 				return fmt.Errorf("path is not a directory: %s", dir)
 			}
 
-			lg.Info("scanning for duplicates", logger.String("directory", dir))
+			log.Info("scanning for duplicates", logger.String("directory", dir))
 
 			type fileHash struct {
 				path string
@@ -239,7 +241,7 @@ func newDuplicatesCmd(fs interfaces.FileSystem, lg logger.Logger) *cobra.Command
 
 					hash, err := hashFile(fs, path)
 					if err != nil {
-						lg.Warn("failed to hash file", logger.String("file", path), logger.Error(err))
+						log.Warn("failed to hash file", logger.String("file", path), logger.Error(err))
 						return
 					}
 					mu.Lock()
@@ -315,7 +317,7 @@ func hashFile(_ interfaces.FileSystem, path string) (string, error) {
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
-func newCleanCmd(fs interfaces.FileSystem, lg logger.Logger) *cobra.Command {
+func newCleanCmd(fs interfaces.FileSystem, log logger.Logger) *cobra.Command {
 	var patterns []string
 	var dryRun bool
 
@@ -355,13 +357,13 @@ func newCleanCmd(fs interfaces.FileSystem, lg logger.Logger) *cobra.Command {
 					matched, _ := filepath.Match(pattern, info.Name)
 					if matched {
 						if dryRunEnabled {
-							lg.Info("would remove", logger.String("file", p))
+							log.Info("would remove", logger.String("file", p))
 						} else {
 							target := filepath.Join(dir, info.Name)
 							if err := fs.Remove(filepath.Clean(target)); err == nil {
 								removed++
 								freed += info.Size
-								lg.Debug("removed", logger.String("file", target))
+								log.Debug("removed", logger.String("file", target))
 							}
 						}
 						break

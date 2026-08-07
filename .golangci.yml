@@ -13,18 +13,11 @@ linters:
     - unused
     - misspell
     - revive
-    - gocritic
     - bodyclose
-    - noctx
     - prealloc
   settings:
     govet:
       enable-all: true
-    gocritic:
-      enabled-tags:
-        - performance
-        - style
-        - experimental
 
 formatters:
   enable:

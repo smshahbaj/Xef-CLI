@@ -4,7 +4,6 @@ package git
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -34,24 +33,22 @@ func newStatsCmd(_ logger.Logger) *cobra.Command {
 		Use:     "stats",
 		Short:   "Show Git repository statistics",
 		Example: `  xef git stats`,
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			ctx := cmd.Context()
-
-			if !isGitRepo(ctx) {
+		RunE: func(_ *cobra.Command, _ []string) error {
+			if !isGitRepo() {
 				return fmt.Errorf("not a git repository")
 			}
 
-			commits, err := gitCount(ctx, "HEAD")
+			commits, err := gitCount("HEAD")
 			if err != nil {
 				return fmt.Errorf("failed to count commits: %w", err)
 			}
 
-			authors, err := gitAuthors(ctx)
+			authors, err := gitAuthors()
 			if err != nil {
 				return fmt.Errorf("failed to get authors: %w", err)
 			}
 
-			branch, err := gitCurrentBranch(ctx)
+			branch, err := gitCurrentBranch()
 			if err != nil {
 				branch = "unknown"
 			}
@@ -81,14 +78,12 @@ func newBranchesCmd(_ logger.Logger) *cobra.Command {
 		Use:     "branches",
 		Short:   "List branches with last commit info",
 		Example: `  xef git branches`,
-		RunE: func(cmd *cobra.Command, _ []string) error {
-			ctx := cmd.Context()
-
-			if !isGitRepo(ctx) {
+		RunE: func(_ *cobra.Command, _ []string) error {
+			if !isGitRepo() {
 				return fmt.Errorf("not a git repository")
 			}
 
-			out, err := exec.CommandContext(ctx, "git", "branch", "-a", "--format=%(refname:short)|%(committerdate:short)|%(subject)").Output()
+			out, err := exec.Command("git", "branch", "-a", "--format=%(refname:short)|%(committerdate:short)|%(subject)").Output()
 			if err != nil {
 				return fmt.Errorf("failed to list branches: %w", err)
 			}
@@ -109,21 +104,21 @@ func newBranchesCmd(_ logger.Logger) *cobra.Command {
 	}
 }
 
-func isGitRepo(ctx context.Context) bool {
-	_, err := exec.CommandContext(ctx, "git", "rev-parse", "--git-dir").Output()
+func isGitRepo() bool {
+	_, err := exec.Command("git", "rev-parse", "--git-dir").Output()
 	return err == nil
 }
 
-func gitCount(ctx context.Context, rev string) (string, error) {
-	out, err := exec.CommandContext(ctx, "git", "rev-list", "--count", rev).Output()
+func gitCount(rev string) (string, error) {
+	out, err := exec.Command("git", "rev-list", "--count", rev).Output()
 	if err != nil {
 		return "", err
 	}
 	return strings.TrimSpace(string(out)), nil
 }
 
-func gitCurrentBranch(ctx context.Context) (string, error) {
-	out, err := exec.CommandContext(ctx, "git", "branch", "--show-current").Output()
+func gitCurrentBranch() (string, error) {
+	out, err := exec.Command("git", "branch", "--show-current").Output()
 	if err != nil {
 		return "", err
 	}
@@ -135,8 +130,8 @@ type authorStat struct {
 	count string
 }
 
-func gitAuthors(ctx context.Context) ([]authorStat, error) {
-	out, err := exec.CommandContext(ctx, "git", "shortlog", "-sn", "HEAD").Output()
+func gitAuthors() ([]authorStat, error) {
+	out, err := exec.Command("git", "shortlog", "-sn", "HEAD").Output()
 	if err != nil {
 		return nil, err
 	}
