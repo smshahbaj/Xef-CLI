@@ -10,14 +10,14 @@ import (
 
 // MockHTTPClient is a test double for HTTPClient.
 type MockHTTPClient struct {
-	mu            sync.Mutex
 	GetResponse   *interfaces.HTTPResponse
-	GetError      error
 	PostResponse  *interfaces.HTTPResponse
+	GetError      error
 	PostError     error
 	DownloadError error
 	LastURL       string
 	LastDest      string
+	mu            sync.Mutex
 }
 
 // Get performs a mock GET request.
