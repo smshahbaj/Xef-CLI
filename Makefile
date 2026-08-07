@@ -1,4 +1,4 @@
-.PHONY: build test lint clean install run
+.PHONY: build test test-race lint clean install run
 
 BINARY_NAME := xef
 BUILD_DIR := bin
@@ -13,11 +13,14 @@ install:
 	go install $(LDFLAGS) ./cmd/xefcli
 
 test:
-	go test -v -race -coverprofile=coverage.out ./...
+	go test -v -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out
 
+test-race:
+	go test -v -race ./...
+
 test-ci:
-	go test -v -race -coverprofile=coverage.out ./...
+	go test -v -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out
 
 lint:

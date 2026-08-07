@@ -1,7 +1,7 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 echo "Running tests..."
-go test -v -race -coverprofile=coverage.out ./...
+go test -v -coverprofile=coverage.out ./...
 go tool cover -func=coverage.out
 echo "Tests complete"
