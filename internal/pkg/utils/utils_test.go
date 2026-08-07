@@ -1,3 +1,4 @@
+//nolint:revive // ignore meaningless package name warning for utils
 package utils
 
 import (
