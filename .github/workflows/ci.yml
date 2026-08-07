@@ -36,8 +36,12 @@ jobs:
           go-version: ${{ matrix.go }}
       - run: go mod download
       - run: go mod verify
-      - run: go test -v -race -coverprofile=coverage.out ./...
-      - run: go tool cover -func=coverage.out
+      - name: Run tests
+        shell: bash
+        run: go test -v -race -coverprofile=coverage.out ./...
+      - name: Show coverage
+        shell: bash
+        run: go tool cover -func=coverage.out
 
   build:
     runs-on: ubuntu-latest
