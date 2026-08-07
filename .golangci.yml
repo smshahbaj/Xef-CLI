@@ -1,3 +1,5 @@
+version: "2"
+
 run:
   timeout: 5m
   go: "1.22"
@@ -18,15 +20,14 @@ linters:
     - bodyclose
     - noctx
     - prealloc
-
-linters-settings:
-  govet:
-    enable-all: true
-  gocritic:
-    enabled-tags:
-      - performance
-      - style
-      - experimental
+  settings:
+    govet:
+      enable-all: true
+    gocritic:
+      enabled-tags:
+        - performance
+        - style
+        - experimental
 
 issues:
   exclude-use-default: false
