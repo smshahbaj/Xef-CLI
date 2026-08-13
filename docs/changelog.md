@@ -1,3 +1,17 @@
+## [1.0.2] - 2026-08-13
+- Hardened doctor diagnostics and safe repair mode
+- Added tracked `.env` detection
+- Redacted environment values by default
+- Made JSON diffs deterministic
+- Made HTTP downloads atomic
+- Hardened project scaffolding and added parser regression coverage
+
+- Added deterministic project health diagnostics with `xef doctor`.
+- Added JSON output for automation and CI integrations.
+- Hardened HTTP benchmark flag validation.
+- Hardened environment JSON serialization.
+- Improved command-level error handling and project diagnostics.
+
 # Changelog
 
 All notable changes to this project will be documented in this file.

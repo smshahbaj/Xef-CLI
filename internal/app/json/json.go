@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
 	"github.com/smshahbaj/Xef-CLI/internal/pkg/tui"
@@ -184,7 +185,13 @@ func diffMaps(prefix string, m1, m2 map[string]interface{}) []string {
 		allKeys[k] = true
 	}
 
+	keys := make([]string, 0, len(allKeys))
 	for k := range allKeys {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
 		path := prefix + "." + k
 		if prefix == "" {
 			path = k

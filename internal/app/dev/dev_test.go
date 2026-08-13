@@ -1,6 +1,9 @@
 package dev
 
 import (
+	"go/parser"
+	"go/token"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -85,4 +88,22 @@ func TestToTitle(t *testing.T) {
 	assert.Equal(t, "H", toTitle("h"))
 	assert.Equal(t, "", toTitle(""))
 	assert.Equal(t, "HelloWorld", toTitle("helloWorld"))
+}
+
+func TestScaffoldGoProducesParsableMain(t *testing.T) {
+	fs := filesystem.NewOSFileSystem()
+	root := t.TempDir()
+	name := filepath.Join(root, "demo")
+	requireNoError := func(err error) {
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	requireNoError(scaffoldGo(fs, name))
+	data, err := os.ReadFile(filepath.Join(name, "cmd", "demo", "main.go"))
+	requireNoError(err)
+	fset := token.NewFileSet()
+	if _, err := parser.ParseFile(fset, "main.go", data, parser.AllErrors); err != nil {
+		t.Fatalf("generated Go source is not parsable: %v\n%s", err, data)
+	}
 }

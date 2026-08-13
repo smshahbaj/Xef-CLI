@@ -30,7 +30,7 @@ A production-grade, cross-platform CLI toolkit built in Go for developers who de
 
 ### 🌐 HTTP Tools
 - `get` - Perform HTTP GET requests
-- `download` - Download files with progress
+- `download` - Download files safely with atomic finalization
 - `benchmark` - Load test HTTP endpoints
 
 ### 💻 System Tools
@@ -45,6 +45,19 @@ A production-grade, cross-platform CLI toolkit built in Go for developers who de
 ### 🛠️ Dev Tools
 - `project` - Scaffold Go/Python projects
 - `env` - Display environment variables
+
+### 🩺 Project Doctor
+- `doctor` - Diagnose project health locally
+- `doctor --json` - Emit CI-friendly diagnostics
+- `doctor --fix` - Apply only safe, non-destructive missing-file fixes
+- `doctor --strict` - Fail when warnings or errors are detected
+
+### 🔎 Security & Project Scanning
+- `scan` - Scan project files for security and maintenance findings
+- `scan --json` - Emit machine-readable scan results
+- `secret scan` - Scan specifically for exposed credential patterns
+- `secret scan --json` - Emit machine-readable secret-scan results
+- `report` - Generate an HTML project health report
 
 ## 🚀 Installation
 
@@ -84,6 +97,14 @@ xef git stats
 
 # Create project
 xef dev project myapp --lang go
+
+# Diagnose and safely repair project hygiene
+xef doctor
+xef doctor --fix
+xef doctor --strict --json
+xef scan
+xef secret scan
+xef report
 ```
 
 ## 🏗️ Architecture
@@ -105,9 +126,24 @@ See [docs/architecture.md](docs/architecture.md) for details.
 make test
 
 # Run with race detection
-make test-ci
+make test-race
 
 # Run linter
+make lint
+```
+
+## 🔎 Release-quality checks
+
+```bash
+# Project health
+xef doctor --strict
+
+# Machine-readable health report
+xef doctor --json
+
+# Format and static analysis
+make fmt
+make vet
 make lint
 ```
 

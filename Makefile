@@ -2,7 +2,7 @@
 
 BINARY_NAME := xef
 BUILD_DIR := bin
-VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+VERSION ?= v1.0.2
 LDFLAGS := -ldflags "-X main.version=$(VERSION) -s -w"
 
 build:

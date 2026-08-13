@@ -68,8 +68,14 @@ func TestBenchmarkCmd(t *testing.T) {
 }
 
 func TestParseHeaders(t *testing.T) {
-	h := parseHeaders([]string{"Content-Type: application/json", "Authorization: Bearer token"})
+	h := parseHeaders([]string{"Content-Type: application/json", "Authorization: Bearer token", "invalid"})
 	assert.Equal(t, "application/json", h["Content-Type"])
 	assert.Equal(t, "Bearer token", h["Authorization"])
-	assert.Empty(t, parseHeaders([]string{"invalid"}))
+	assert.NotContains(t, h, "invalid")
+}
+
+func TestDefaultDownloadName(t *testing.T) {
+	assert.Equal(t, "file.zip", defaultDownloadName("https://example.com/path/file.zip?download=1"))
+	assert.Equal(t, "download", defaultDownloadName("https://example.com/"))
+	assert.Equal(t, "download", defaultDownloadName("://bad-url"))
 }

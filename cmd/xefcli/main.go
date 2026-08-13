@@ -7,7 +7,7 @@ import (
 	"github.com/smshahbaj/Xef-CLI/internal/app"
 )
 
-var version = "v1.0.1"
+var version = "v1.0.2"
 
 func main() {
 	a := app.New(version)

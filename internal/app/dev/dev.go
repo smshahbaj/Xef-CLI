@@ -2,6 +2,7 @@
 package dev
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -48,13 +49,16 @@ func newProjectCreateCmd(fs interfaces.FileSystem, _ logger.Logger) *cobra.Comma
 			switch strings.ToLower(lang) {
 			case "go":
 				if err := scaffoldGo(fs, name); err != nil {
-					return err
+					_ = os.RemoveAll(name)
+					return fmt.Errorf("failed to scaffold Go project: %w", err)
 				}
 			case "python":
 				if err := scaffoldPython(fs, name); err != nil {
-					return err
+					_ = os.RemoveAll(name)
+					return fmt.Errorf("failed to scaffold Python project: %w", err)
 				}
 			default:
+				_ = os.RemoveAll(name)
 				return fmt.Errorf("unsupported language: %s (supported: go, python)", lang)
 			}
 
@@ -155,6 +159,7 @@ func toTitle(s string) string {
 
 func newEnvCmd(_ logger.Logger) *cobra.Command {
 	var format string
+	var showValues bool
 
 	cmd := &cobra.Command{
 		Use:     "env",
@@ -162,36 +167,43 @@ func newEnvCmd(_ logger.Logger) *cobra.Command {
 		Example: `  xef dev env --format json`,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			envs := os.Environ()
+			masked := make([]string, 0, len(envs))
+			values := make(map[string]string, len(envs))
+			for _, e := range envs {
+				parts := strings.SplitN(e, "=", 2)
+				if len(parts) != 2 {
+					continue
+				}
+				value := parts[1]
+				if !showValues {
+					value = "<redacted>"
+				}
+				masked = append(masked, parts[0]+"="+value)
+				values[parts[0]] = value
+			}
 			switch strings.ToLower(format) {
 			case "json":
-				fmt.Println("{")
-				for i, e := range envs {
-					parts := strings.SplitN(e, "=", 2)
-					comma := ","
-					if i == len(envs)-1 {
-						comma = ""
-					}
-					val := ""
-					if len(parts) > 1 {
-						val = parts[1]
-					}
-					fmt.Printf(`  "%s": "%s"%s`, parts[0], strings.ReplaceAll(val, `"`, `\"`), comma)
-					fmt.Println()
+				data, err := json.MarshalIndent(values, "", "  ")
+				if err != nil {
+					return fmt.Errorf("failed to encode environment: %w", err)
 				}
-				fmt.Println("}")
+				fmt.Println(string(data))
 			case "export":
-				for _, e := range envs {
+				for _, e := range masked {
 					fmt.Printf("export %s\n", e)
 				}
-			default:
-				for _, e := range envs {
+			case "list":
+				for _, e := range masked {
 					fmt.Println(e)
 				}
+			default:
+				return fmt.Errorf("unsupported format: %s (use list, json, export)", format)
 			}
 			return nil
 		},
 	}
 
 	cmd.Flags().StringVar(&format, "format", "list", "output format: list, json, export")
+	cmd.Flags().BoolVar(&showValues, "show-values", false, "show environment values (may expose secrets)")
 	return cmd
 }

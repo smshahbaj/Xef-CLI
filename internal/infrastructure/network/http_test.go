@@ -2,6 +2,7 @@ package network
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -90,3 +91,42 @@ func TestDownloadBadStatus(t *testing.T) {
 	err := client.Download(ctx, server.URL, filepath.Join(t.TempDir(), "file.txt"), nil)
 	assert.Error(t, err)
 }
+
+type failingBody struct {
+	read bool
+}
+
+func (b *failingBody) Read(p []byte) (int, error) {
+	if b.read {
+		return 0, io.ErrUnexpectedEOF
+	}
+	b.read = true
+	copy(p, []byte("partial"))
+	return len("partial"), nil
+}
+
+func (b *failingBody) Close() error { return nil }
+
+func TestDownloadFailureDoesNotLeavePartialDestination(t *testing.T) {
+	client := NewDefaultHTTPClient(2 * time.Second)
+	client.client.Transport = roundTripperFunc(func(*http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       &failingBody{},
+			Header:     make(http.Header),
+		}, nil
+	})
+
+	dest := filepath.Join(t.TempDir(), "download.txt")
+	err := client.Download(context.Background(), "https://example.test/file", dest, nil)
+	if err == nil {
+		t.Fatal("expected interrupted download to fail")
+	}
+	if _, statErr := os.Stat(dest); !os.IsNotExist(statErr) {
+		t.Fatalf("destination should not exist after failed download, stat error: %v", statErr)
+	}
+}
+
+type roundTripperFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripperFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }

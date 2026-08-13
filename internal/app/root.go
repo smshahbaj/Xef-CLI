@@ -6,10 +6,12 @@ import (
 
 	appcrypto "github.com/smshahbaj/Xef-CLI/internal/app/crypto"
 	"github.com/smshahbaj/Xef-CLI/internal/app/dev"
+	"github.com/smshahbaj/Xef-CLI/internal/app/doctor"
 	"github.com/smshahbaj/Xef-CLI/internal/app/file"
 	"github.com/smshahbaj/Xef-CLI/internal/app/git"
 	apphttp "github.com/smshahbaj/Xef-CLI/internal/app/http"
 	"github.com/smshahbaj/Xef-CLI/internal/app/json"
+	"github.com/smshahbaj/Xef-CLI/internal/app/scan"
 	"github.com/smshahbaj/Xef-CLI/internal/app/system"
 	"github.com/smshahbaj/Xef-CLI/internal/core/config"
 	"github.com/smshahbaj/Xef-CLI/internal/core/logger"
@@ -85,6 +87,10 @@ HTTP operations, system monitoring, and development workflows.`,
 	app.RootCmd.AddCommand(git.NewCommand(app.Logger))
 	app.RootCmd.AddCommand(system.NewCommand(sysProvider, app.Logger))
 	app.RootCmd.AddCommand(dev.NewCommand(fs, app.Logger))
+	app.RootCmd.AddCommand(doctor.NewCommand())
+	app.RootCmd.AddCommand(scan.NewCommand())
+	app.RootCmd.AddCommand(scan.NewSecretCommand())
+	app.RootCmd.AddCommand(scan.NewReportCommand())
 
 	app.RootCmd.SetUsageTemplate(usageTemplate())
 	return app

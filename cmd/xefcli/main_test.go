@@ -49,5 +49,5 @@ func TestMainInvokesRootCommand(t *testing.T) {
 	require.NoError(t, w.Close())
 	output, err := io.ReadAll(r)
 	require.NoError(t, err)
-	assert.Contains(t, string(output), "v1.0.1")
+	assert.Contains(t, string(output), "v1.0.2")
 }

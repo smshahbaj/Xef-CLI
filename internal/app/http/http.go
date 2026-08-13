@@ -4,7 +4,9 @@ package http
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -78,11 +80,7 @@ func newDownloadCmd(client interfaces.HTTPClient, log logger.Logger) *cobra.Comm
 		RunE: func(cmd *cobra.Command, args []string) error {
 			url := args[0]
 			if output == "" {
-				parts := strings.Split(url, "/")
-				output = parts[len(parts)-1]
-				if output == "" {
-					output = "download"
-				}
+				output = defaultDownloadName(url)
 			}
 
 			h := parseHeaders(headers)
@@ -114,6 +112,15 @@ func newBenchmarkCmd(client interfaces.HTTPClient, _ logger.Logger) *cobra.Comma
 		Example: `  xef http benchmark https://api.example.com -n 1000 -c 50`,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if requests <= 0 {
+				return fmt.Errorf("requests must be greater than 0")
+			}
+			if concurrency <= 0 {
+				return fmt.Errorf("concurrency must be greater than 0")
+			}
+			if timeout <= 0 {
+				return fmt.Errorf("timeout must be greater than 0")
+			}
 			url := args[0]
 			fmt.Printf("Benchmarking %s\n", url)
 			fmt.Printf("Requests: %d, Concurrency: %d\n\n", requests, concurrency)
@@ -205,12 +212,26 @@ func newBenchmarkCmd(client interfaces.HTTPClient, _ logger.Logger) *cobra.Comma
 	return cmd
 }
 
+func defaultDownloadName(rawURL string) string {
+	u, err := url.Parse(rawURL)
+	if err == nil {
+		name := filepath.Base(u.Path)
+		if name != "." && name != string(filepath.Separator) && name != "" {
+			return name
+		}
+	}
+	return "download"
+}
+
 func parseHeaders(headers []string) map[string]string {
 	h := make(map[string]string)
 	for _, header := range headers {
 		parts := strings.SplitN(header, ":", 2)
 		if len(parts) == 2 {
-			h[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+			key := strings.TrimSpace(parts[0])
+			if key != "" {
+				h[key] = strings.TrimSpace(parts[1])
+			}
 		}
 	}
 	return h

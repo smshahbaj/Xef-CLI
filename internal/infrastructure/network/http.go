@@ -132,23 +132,37 @@ func (c *DefaultHTTPClient) Download(ctx context.Context, url, dest string, head
 		return fmt.Errorf("download returned status %d", resp.StatusCode)
 	}
 
-	// Create parent directories if they don't exist
+	// Create parent directories if they don't exist. Write to a temporary file
+	// first so interrupted downloads never leave a corrupt destination behind.
 	if err = os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
 		return fmt.Errorf("failed to create destination directory: %w", err)
 	}
 
-	out, err := os.Create(dest)
+	tmp, err := os.CreateTemp(filepath.Dir(dest), ".xef-download-*")
 	if err != nil {
-		return fmt.Errorf("failed to create destination file: %w", err)
+		return fmt.Errorf("failed to create temporary download file: %w", err)
 	}
-	defer func() {
-		if cerr := out.Close(); cerr != nil {
-			fmt.Printf("error closing destination file: %v\n", cerr)
-		}
-	}()
+	tmpName := tmp.Name()
+	cleanup := func() {
+		_ = tmp.Close()
+		_ = os.Remove(tmpName)
+	}
 
-	if _, err := io.Copy(out, resp.Body); err != nil {
+	if _, err := io.Copy(tmp, resp.Body); err != nil {
+		cleanup()
 		return fmt.Errorf("failed to write file: %w", err)
+	}
+	if err := tmp.Close(); err != nil {
+		_ = os.Remove(tmpName)
+		return fmt.Errorf("failed to close temporary download file: %w", err)
+	}
+	if err := os.Chmod(tmpName, 0o644); err != nil {
+		_ = os.Remove(tmpName)
+		return fmt.Errorf("failed to set destination permissions: %w", err)
+	}
+	if err := os.Rename(tmpName, dest); err != nil {
+		_ = os.Remove(tmpName)
+		return fmt.Errorf("failed to finalize downloaded file: %w", err)
 	}
 	return nil
 }
