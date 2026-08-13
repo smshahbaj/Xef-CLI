@@ -9,8 +9,12 @@ import (
 
 func TestRunScanFindsSecretAndIgnoresPlaceholder(t *testing.T) {
 	root := t.TempDir()
-	os.WriteFile(filepath.Join(root, "safe.txt"), []byte(`api_key=super_secret_value_123456789`), 0o600)
-	os.WriteFile(filepath.Join(root, "real.env"), []byte(`api_key=sk_live_`+strings.Repeat("A", 24)), 0o600)
+	if err := os.WriteFile(filepath.Join(root, "safe.txt"), []byte(`api_key=super_secret_value_123456789`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "real.env"), []byte(`api_key=sk_live_`+strings.Repeat("A", 24)), 0o600); err != nil {
+		t.Fatal(err)
+	}
 	r, err := runScan(root, 0, false)
 	if err != nil {
 		t.Fatal(err)
@@ -22,11 +26,21 @@ func TestRunScanFindsSecretAndIgnoresPlaceholder(t *testing.T) {
 
 func TestRunScanIgnoresGeneratedAndGitIgnoredFiles(t *testing.T) {
 	root := t.TempDir()
-	os.WriteFile(filepath.Join(root, ".gitignore"), []byte("*.exe\nignored.txt\n"), 0o644)
-	os.Mkdir(filepath.Join(root, ".git"), 0o755)
-	os.WriteFile(filepath.Join(root, "ignored.txt"), []byte(`api_key=sk_live_`+strings.Repeat("A", 24)), 0o600)
-	os.WriteFile(filepath.Join(root, "xef.exe"), []byte(`api_key=sk_live_`+strings.Repeat("A", 24)), 0o600)
-	os.WriteFile(filepath.Join(root, "ok.txt"), []byte("hello"), 0o600)
+	if err := os.WriteFile(filepath.Join(root, ".gitignore"), []byte("*.exe\nignored.txt\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(filepath.Join(root, ".git"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "ignored.txt"), []byte(`api_key=sk_live_`+strings.Repeat("A", 24)), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "xef.exe"), []byte(`api_key=sk_live_`+strings.Repeat("A", 24)), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "ok.txt"), []byte("hello"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 	r, err := runScan(root, 0, false)
 	if err != nil {
 		t.Fatal(err)

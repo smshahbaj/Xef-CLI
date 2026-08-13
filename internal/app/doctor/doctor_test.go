@@ -27,9 +27,9 @@ func TestDoctorJSONShape(t *testing.T) {
 	root := t.TempDir()
 	findings, score := diagnose(root)
 	payload := struct {
-		Score    int       `json:"score"`
 		Findings []finding `json:"findings"`
-	}{score, findings}
+		Score    int       `json:"score"`
+	}{findings, score}
 	data, err := json.Marshal(payload)
 	if err != nil {
 		t.Fatal(err)
@@ -56,16 +56,16 @@ func TestApplySafeFixesCreatesOnlyMissingFiles(t *testing.T) {
 			t.Fatalf("expected %s: %v", name, err)
 		}
 	}
-	before, err := os.ReadFile(filepath.Join(root, "README.md"))
-	if err != nil {
-		t.Fatal(err)
+	before, readErr := os.ReadFile(filepath.Join(root, "README.md"))
+	if readErr != nil {
+		t.Fatal(readErr)
 	}
 	if _, err := applySafeFixes(root); err != nil {
 		t.Fatal(err)
 	}
-	after, err := os.ReadFile(filepath.Join(root, "README.md"))
-	if err != nil {
-		t.Fatal(err)
+	after, afterErr := os.ReadFile(filepath.Join(root, "README.md"))
+	if afterErr != nil {
+		t.Fatal(afterErr)
 	}
 	if string(before) != string(after) {
 		t.Fatal("safe fix overwrote an existing file")
@@ -124,16 +124,16 @@ func TestApplySafeFixesProtectsExistingEnv(t *testing.T) {
 	if _, err := applySafeFixes(root); err != nil {
 		t.Fatal(err)
 	}
-	data, err := os.ReadFile(filepath.Join(root, ".gitignore"))
-	if err != nil {
-		t.Fatal(err)
+	data, readErr := os.ReadFile(filepath.Join(root, ".gitignore"))
+	if readErr != nil {
+		t.Fatal(readErr)
 	}
 	if !gitignoreContainsEnv(string(data)) {
 		t.Fatal("expected .env to be protected")
 	}
-	env, err := os.ReadFile(filepath.Join(root, ".env"))
-	if err != nil {
-		t.Fatal(err)
+	env, envErr := os.ReadFile(filepath.Join(root, ".env"))
+	if envErr != nil {
+		t.Fatal(envErr)
 	}
 	if string(env) != "SECRET=placeholder\n" {
 		t.Fatal("safe fix modified .env contents")
@@ -179,8 +179,8 @@ func TestIgnoredGeneratedFilesDoNotAffectRepositorySize(t *testing.T) {
 	}
 	// A real Git repository is required for check-ignore semantics.
 	cmd := exec.Command("git", "-C", root, "init")
-	if out, err := cmd.CombinedOutput(); err != nil {
-		t.Skipf("git unavailable: %v (%s)", err, out)
+	if out, cmdErr := cmd.CombinedOutput(); cmdErr != nil {
+		t.Skipf("git unavailable: %v (%s)", cmdErr, out)
 	}
 	large := filepath.Join(root, "xef.exe")
 	if err := os.WriteFile(large, make([]byte, 11*1024*1024), 0o644); err != nil {

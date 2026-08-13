@@ -25,9 +25,9 @@ type Finding struct {
 
 type Result struct {
 	Root      string    `json:"root"`
-	Files     int       `json:"files"`
-	Findings  []Finding `json:"findings"`
 	Generated string    `json:"generated"`
+	Findings  []Finding `json:"findings"`
+	Files     int       `json:"files"`
 }
 
 var patterns = []*regexp.Regexp{
@@ -151,8 +151,8 @@ func runScan(root string, max int64, includeQuality bool) (Result, error) {
 			return nil
 		}
 		r.Files++
-		data, err := os.ReadFile(path)
-		if err != nil {
+		data, readErr := os.ReadFile(path)
+		if readErr != nil {
 			return nil
 		}
 		text := string(data)
@@ -208,7 +208,7 @@ func isIgnored(root, path string) bool {
 	rel = filepath.ToSlash(rel)
 
 	// Prefer Git's own matcher when this is a real Git repository.
-	if _, err := os.Stat(filepath.Join(root, ".git")); err == nil {
+	if _, statErr := os.Stat(filepath.Join(root, ".git")); statErr == nil {
 		cmd := exec.Command("git", "-C", root, "check-ignore", "--quiet", "--", rel)
 		if cmd.Run() == nil {
 			return true
@@ -323,14 +323,14 @@ func writeReport(path string, r Result) error {
 		os.Remove(tmp)
 		return err
 	}
-	if _, err := os.Stat(path); err == nil {
-		if err := os.Remove(path); err != nil {
+	if _, statErr := os.Stat(path); statErr == nil {
+		if rmErr := os.Remove(path); rmErr != nil {
 			os.Remove(tmp)
-			return fmt.Errorf("replace report: %w", err)
+			return fmt.Errorf("replace report: %w", rmErr)
 		}
-	} else if !os.IsNotExist(err) {
+	} else if !os.IsNotExist(statErr) {
 		os.Remove(tmp)
-		return err
+		return statErr
 	}
 	if err = os.Rename(tmp, path); err != nil {
 		os.Remove(tmp)

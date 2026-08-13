@@ -77,10 +77,10 @@ func NewCommand() *cobra.Command {
 			findings, score := diagnoseWithOptions(root, maxFileSize)
 			if jsonOut {
 				payload := struct {
-					Score    int         `json:"score"`
 					Findings []finding   `json:"findings"`
 					Fixes    []fixResult `json:"fixes,omitempty"`
-				}{score, findings, fixes}
+					Score    int         `json:"score"`
+				}{findings, fixes, score}
 				data, err := json.MarshalIndent(payload, "", "  ")
 				if err != nil {
 					return err
@@ -132,11 +132,11 @@ func applySafeFixes(root string) ([]fixResult, error) {
 	results := make([]fixResult, 0, 3)
 	createIfMissing := func(name, contents string, mode os.FileMode) error {
 		path := filepath.Join(root, name)
-		if _, err := os.Stat(path); err == nil {
+		if _, statErr := os.Stat(path); statErr == nil {
 			results = append(results, fixResult{"check", "SKIP", name + " already exists"})
 			return nil
-		} else if !os.IsNotExist(err) {
-			return err
+		} else if !os.IsNotExist(statErr) {
+			return statErr
 		}
 		if err := os.WriteFile(path, []byte(contents), mode); err != nil {
 			return fmt.Errorf("create %s: %w", name, err)
@@ -152,7 +152,7 @@ func applySafeFixes(root string) ([]fixResult, error) {
 		return nil, err
 	}
 	gitignorePath := filepath.Join(root, ".gitignore")
-	if envInfo, err := os.Stat(filepath.Join(root, ".env")); err == nil && !envInfo.IsDir() {
+	if envInfo, statErr := os.Stat(filepath.Join(root, ".env")); statErr == nil && !envInfo.IsDir() {
 		data, readErr := os.ReadFile(gitignorePath)
 		if readErr != nil {
 			return nil, fmt.Errorf("read .gitignore: %w", readErr)
@@ -184,9 +184,9 @@ func diagnoseWithOptions(root string, maxFileSize int64) ([]finding, int) {
 		return []finding{{Check: "Project", Status: "FAIL", Detail: "directory does not exist", Fixable: false}}, 0
 	}
 
-	if _, err := os.Stat(filepath.Join(root, ".git")); err == nil {
+	if _, statErr := os.Stat(filepath.Join(root, ".git")); statErr == nil {
 		add("Git", "PASS", "repository detected", false)
-		if tracked, err := exec.Command("git", "-C", root, "ls-files", "--error-unmatch", ".env").CombinedOutput(); err == nil && strings.TrimSpace(string(tracked)) != "" {
+		if tracked, cmdErr := exec.Command("git", "-C", root, "ls-files", "--error-unmatch", ".env").CombinedOutput(); cmdErr == nil && strings.TrimSpace(string(tracked)) != "" {
 			add("Git secrets", "FAIL", ".env is tracked by Git", false)
 		} else {
 			add("Git secrets", "PASS", ".env is not tracked by Git", false)
@@ -194,19 +194,19 @@ func diagnoseWithOptions(root string, maxFileSize int64) ([]finding, int) {
 	} else {
 		add("Git", "WARN", "no .git directory detected", false)
 	}
-	if _, err := os.Stat(filepath.Join(root, "README.md")); err == nil {
+	if _, statErr := os.Stat(filepath.Join(root, "README.md")); statErr == nil {
 		add("Documentation", "PASS", "README.md present", false)
 	} else {
 		add("Documentation", "WARN", "README.md is missing", true)
 	}
-	if _, err := os.Stat(filepath.Join(root, ".gitignore")); err == nil {
+	if _, statErr := os.Stat(filepath.Join(root, ".gitignore")); statErr == nil {
 		add("Git hygiene", "PASS", ".gitignore present", false)
 	} else {
 		add("Git hygiene", "WARN", ".gitignore is missing", true)
 	}
 
-	if _, err := os.Stat(filepath.Join(root, "go.mod")); err == nil {
-		if _, err := exec.LookPath("go"); err == nil {
+	if _, statErr := os.Stat(filepath.Join(root, "go.mod")); statErr == nil {
+		if _, execErr := exec.LookPath("go"); execErr == nil {
 			add("Go", "PASS", "go toolchain available", false)
 		} else {
 			add("Go", "FAIL", "go toolchain not found", false)
@@ -263,13 +263,13 @@ func diagnoseWithOptions(root string, maxFileSize int64) ([]finding, int) {
 		add("Filesystem", "WARN", "some files could not be inspected", false)
 	}
 
-	if _, err := os.Stat(filepath.Join(root, "go.mod")); err == nil {
-		if _, err := os.Stat(filepath.Join(root, "go.sum")); err != nil {
+	if _, modStatErr := os.Stat(filepath.Join(root, "go.mod")); modStatErr == nil {
+		if _, sumStatErr := os.Stat(filepath.Join(root, "go.sum")); sumStatErr != nil {
 			add("Go modules", "WARN", "go.mod exists but go.sum is missing", true)
 		} else {
 			add("Go modules", "PASS", "go.mod and go.sum present", false)
 		}
-		if _, err := exec.LookPath("gofmt"); err == nil {
+		if _, gofmtErr := exec.LookPath("gofmt"); gofmtErr == nil {
 			if files := gofmtFiles(root); len(files) == 0 {
 				add("Go formatting", "PASS", "all Go files are gofmt-clean", false)
 			} else {
@@ -277,7 +277,7 @@ func diagnoseWithOptions(root string, maxFileSize int64) ([]finding, int) {
 			}
 		}
 	}
-	if envInfo, err := os.Stat(filepath.Join(root, ".env")); err == nil && !envInfo.IsDir() {
+	if envInfo, envStatErr := os.Stat(filepath.Join(root, ".env")); envStatErr == nil && !envInfo.IsDir() {
 		data, readErr := os.ReadFile(filepath.Join(root, ".gitignore"))
 		if readErr == nil && gitignoreContainsEnv(string(data)) {
 			add("Environment hygiene", "PASS", ".env is ignored by Git", false)
@@ -371,7 +371,7 @@ func containsTodoComment(text string) bool {
 }
 
 func isIgnoredPath(root, path string) bool {
-	if _, err := os.Stat(filepath.Join(root, ".git")); err != nil {
+	if _, statErr := os.Stat(filepath.Join(root, ".git")); statErr != nil {
 		return false
 	}
 	rel, err := filepath.Rel(root, path)
